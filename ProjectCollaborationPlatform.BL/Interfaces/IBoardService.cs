@@ -7,10 +7,11 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
 {
     public interface IBoardService
     {
-        Task<BoardDTO> GetBoardByName(string name);
-        Task<bool> CreateBoard(BoardDTO board);
-        Task<bool> UpdateBoard(Board board);
+        Task<Board> GetBoardByName(string name);
+        Task<Board> GetBoardById(Guid id);
+        Task<bool> CreateBoard(BoardDTO boardDTO);
+        Task<bool> UpdateBoard(BoardDTO boardDTO);
         Task<bool> DeleteBoard(Guid id);
-        Task<bool> SaveAsync();
+        Task<bool> SaveBoardAsync();
     }
 }

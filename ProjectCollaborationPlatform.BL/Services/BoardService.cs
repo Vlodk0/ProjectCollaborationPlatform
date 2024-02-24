@@ -22,7 +22,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                 Name = boardDto.Name,
             };
             _context.Set<Board>().Add(board);
-            return await SaveAsync();
+            return await SaveBoardAsync();
         }
 
         public async Task<bool> DeleteBoard(Guid id)
@@ -36,30 +36,34 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             _context.Set<Board>().Remove(entity);
 
-            return await SaveAsync();
+            return await SaveBoardAsync();
         }
 
-        public async Task<BoardDTO> GetBoardByName(string name)
+        public async Task<Board> GetBoardById(Guid id)
         {
-            var board = await _context.Set<Board>().FindAsync(name);
-            var boardDto = new BoardDTO
-            {
-                Name = board.Name,
-            };
-            return boardDto;
+            return await _context.Set<Board>().FindAsync(id);
         }
 
-        public async Task<bool> SaveAsync()
+        public async Task<Board> GetBoardByName(string name)
+        {
+            return await _context.Set<Board>().FindAsync(name);
+        }
+
+        public async Task<bool> SaveBoardAsync()
         {
             var saved = await _context.SaveChangesAsync();
             return saved > 0 ? true : false;
         }
 
-        public async Task<bool> UpdateBoard(Board board)
+        public async Task<bool> UpdateBoard(BoardDTO boardDTO)
         {
-            _context.Entry(board).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return await SaveAsync();
+            var board = await _context.Boards.Where(n => n.Name == boardDTO.Name).FirstOrDefaultAsync();
+            board = new Board()
+            {
+                Name = boardDTO.Name,
+            };
+            _context.Boards.Update(board);
+            return await SaveBoardAsync();
         }
     }
 }

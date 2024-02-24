@@ -2,6 +2,7 @@
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.DAL.Data.Models;
+using ProjectCollaborationPlatform.Domain.DTOs;
 using System.Xml.Linq;
 
 namespace ProjectCollaborationPlatform.BL.Services
@@ -15,8 +16,13 @@ namespace ProjectCollaborationPlatform.BL.Services
             _context = context;
         }
 
-        public async Task<bool> AddProject(Project project)
+        public async Task<bool> AddProject(ProjectDTO projectDTO)
         {
+            var project = new Project()
+            {
+                Title = projectDTO.Title,
+                Payment = projectDTO.Payment,
+            };
             _context.Set<Project>().Add(project);
             return await SaveProjectAsync();
         }
@@ -68,10 +74,15 @@ namespace ProjectCollaborationPlatform.BL.Services
             return saved > 0 ? true : false;
         }
 
-        public async Task<bool> UpdateProject(Project project)
+        public async Task<bool> UpdateProject(ProjectDTO projectDTO)
         {
-            _context.Entry(project).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var project = await _context.Projects.Where(e => e.Title == projectDTO.Title).FirstOrDefaultAsync();
+            project = new Project()
+            {
+                Title = projectDTO.Title,
+                Payment = projectDTO.Payment,
+            };
+            _context.Projects.Update(project);
             return await SaveProjectAsync();
         }
     }

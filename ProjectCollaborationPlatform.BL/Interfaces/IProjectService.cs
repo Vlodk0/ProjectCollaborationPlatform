@@ -1,6 +1,7 @@
 ﻿
 
 using ProjectCollaborationPlatform.DAL.Data.Models;
+using ProjectCollaborationPlatform.Domain.DTOs;
 
 namespace ProjectCollaborationPlatform.BL.Interfaces
 {
@@ -8,8 +9,8 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
     {
         Task<Project> GetProjectByName(string name);
         Task<Project> GetProjectById(Guid id);
-        Task<bool> AddProject(Project project);
-        Task<bool> UpdateProject(Project project);
+        Task<bool> AddProject(ProjectDTO projectDTO);
+        Task<bool> UpdateProject(ProjectDTO projectDTO);
         Task<bool> DeleteProjectById(Guid id);
         Task<bool> DeleteProjectByName(string name);
         Task<bool> SaveProjectAsync();

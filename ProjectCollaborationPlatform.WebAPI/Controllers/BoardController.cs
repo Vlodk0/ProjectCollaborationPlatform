@@ -8,58 +8,36 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
     [Route("api/[contoller]")]
     [ApiController]
-    public class ProjectController : ControllerBase
+    public class BoardController : ControllerBase
     {
-        private readonly IProjectService _projectService;
+        readonly IBoardService _boardService;
 
-        public ProjectController(IProjectService projectService)    
+        public BoardController(IBoardService boardService)
         {
-            _projectService = projectService;
-        }
-
-        [HttpGet("{name}:string")]
-        public async Task<IActionResult> GetProjectByName([FromRoute] string name)
-        {
-            var project = await _projectService.GetProjectByName(name);
-            if (project == null)
-            {
-                return NotFound("Project with such name doesn't exist");
-            }
-            return Ok(project);
-        }
-
-        [HttpGet("projects")]
-        public async Task<IActionResult> GetAllProjects()
-        {
-            var projects = await _projectService.GetAllProjects();
-            if (projects != null || projects.Count != 0)
-            {
-                return Ok(projects);
-            }
-            return NotFound("Projects don't exist");
+            _boardService = boardService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProject([FromBody] ProjectDTO project)
+        public async Task<IActionResult> CreateBoard([FromBody] BoardDTO board)
         {
             try
             {
-                if (project == null)
+                if (board == null)
                 {
                     return BadRequest();
                 }
 
-                var prj = await _projectService.GetProjectById(project.Id);
+                var brd = await _boardService.GetBoardById(board.Id);
 
-                if (prj == null)
+                if (brd == null)
                 {
                     ModelState.AddModelError("id", "Project id already in use");
                     return BadRequest(ModelState);
                 }
-                if (await _projectService.AddProject(project))
+                if (await _boardService.CreateBoard(board))
                 {
-                    var createdProject = await _projectService.GetProjectByName(project.Title);
-                    return CreatedAtAction(nameof(GetProjectByName), new { title = createdProject.Title }, createdProject);
+                    var createdProject = await _boardService.GetBoardByName(board.Name);
+                    return CreatedAtAction(nameof(GetBoardByName), new { title = createdProject.Name }, createdProject);
                 }
                 else
                 {
@@ -76,24 +54,35 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
+        [HttpGet("{name}:string")]
+        public async Task<IActionResult> GetBoardByName([FromRoute] string name)
+        {
+            var board = await _boardService.GetBoardByName(name);
+            if (board == null)
+            {
+                return NotFound("Board with such name doesn't exist");
+            }
+            return Ok(board);
+        }
+
         [HttpPut("{id:Guid}")]
-        public async Task<IActionResult> UpdateProject(ProjectDTO projectDTO)
+        public async Task<IActionResult> UpdateBoard(BoardDTO boardDTO)
         {
             try
             {
-                if (projectDTO.Id != projectDTO.Id)
+                if (boardDTO.Id != boardDTO.Id)
                 {
                     return BadRequest("Project ID mismatch");
                 }
 
-                var projectToUpdate = await _projectService.GetProjectById(projectDTO.Id);
+                var boardToUpdate = await _boardService.GetBoardById(boardDTO.Id);
 
-                if (projectToUpdate == null)
+                if (boardToUpdate == null)
                 {
-                    return NotFound($"Project with ID = {projectDTO.Id} not found");
+                    return NotFound($"Project with ID = {boardDTO.Id} not found");
                 }
 
-                if (await _projectService.UpdateProject(projectDTO))
+                if (await _boardService.UpdateBoard(boardDTO))
                 {
                     return Ok("Project updated succesfully");
                 }
@@ -111,18 +100,18 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpDelete("{name:string}")]
-        public async Task<ActionResult<Project>> DeleteProjectByName(string name)
+        public async Task<ActionResult<Board>> DeleteBoardByName(BoardDTO board)
         {
             try
             {
-                var projectToDelete = await _projectService.GetProjectByName(name);
+                var boardToDelete = await _boardService.GetBoardByName(board.Name);
 
-                if (projectToDelete == null)
+                if (boardToDelete == null)
                 {
-                    return NotFound($"Project with name = {name} not found");
+                    return NotFound($"Project with name = {board.Name} not found");
                 }
 
-                if (await _projectService.DeleteProjectByName(name))
+                if (await _boardService.DeleteBoard(board.Id))
                 {
                     return Ok("Project deleted succesfully");
                 }
@@ -138,6 +127,5 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     "Error deleting data");
             }
         }
-
     }
 }
