@@ -30,11 +30,6 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
             
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server=localhost;Database=ProjectCollaborationPlatformDB;Trusted_Connection=True;");
-            base.OnConfiguring(optionsBuilder);
-        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
