@@ -8,7 +8,6 @@ namespace ProjectCollaborationPlatform.DAL.Data.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public bool IsDeleted { get; set; }
-        public Guid RoleID { get; set; }
         public string RoleName { get; set; }
 
     }

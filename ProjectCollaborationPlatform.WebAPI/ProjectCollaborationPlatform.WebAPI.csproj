@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectCollaborationPlatform.DAL\ProjectCollaborationPlatform.DAL.csproj" />
+    <ProjectReference Include="..\ProjectCollaborationPlatform.BL\ProjectCollaborationPlatform.BL.csproj" />
   </ItemGroup>
 
 </Project>

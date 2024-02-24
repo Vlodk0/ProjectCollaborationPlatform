@@ -7,7 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectCollaborationPlatfor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectCollaborationPlatform.DAL", "ProjectCollaborationPlatform.DAL\ProjectCollaborationPlatform.DAL.csproj", "{8E371916-CE3B-4890-85DE-40C11D449A61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectCollaborationPlatform.WebAPI", "ProjectCollaborationPlatform.WebAPI\ProjectCollaborationPlatform.WebAPI.csproj", "{9E56C2E0-E320-46DC-9C3D-FE6C7E85074E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectCollaborationPlatform.WebAPI", "ProjectCollaborationPlatform.WebAPI\ProjectCollaborationPlatform.WebAPI.csproj", "{9E56C2E0-E320-46DC-9C3D-FE6C7E85074E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectCollaborationPlatform.BL", "ProjectCollaborationPlatform.BL\ProjectCollaborationPlatform.BL.csproj", "{A4FAA09A-D87C-44B5-AAC8-A86E75548269}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectCollaborationPlatform.Domain", "ProjectCollaborationPlatform.Domain\ProjectCollaborationPlatform.Domain.csproj", "{6BCEBFE9-1790-45DF-9A9C-AD9BB299C14C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{9E56C2E0-E320-46DC-9C3D-FE6C7E85074E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E56C2E0-E320-46DC-9C3D-FE6C7E85074E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E56C2E0-E320-46DC-9C3D-FE6C7E85074E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4FAA09A-D87C-44B5-AAC8-A86E75548269}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4FAA09A-D87C-44B5-AAC8-A86E75548269}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4FAA09A-D87C-44B5-AAC8-A86E75548269}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4FAA09A-D87C-44B5-AAC8-A86E75548269}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BCEBFE9-1790-45DF-9A9C-AD9BB299C14C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BCEBFE9-1790-45DF-9A9C-AD9BB299C14C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BCEBFE9-1790-45DF-9A9C-AD9BB299C14C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BCEBFE9-1790-45DF-9A9C-AD9BB299C14C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

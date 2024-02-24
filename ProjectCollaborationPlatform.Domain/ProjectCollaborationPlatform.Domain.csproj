@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ProjectCollaborationPlatform.DAL\ProjectCollaborationPlatform.DAL.csproj" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

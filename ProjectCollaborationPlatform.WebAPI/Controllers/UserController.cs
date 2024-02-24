@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
+using ProjectCollaborationPlatform.Domain.DTOs;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
@@ -15,18 +16,18 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _userService = userService;
         }
 
-        [HttpGet("GetById")]
-        public async Task<IActionResult> GetUserById([FromQuery] Guid id)
+        [HttpGet("{id:Guid}")]
+        public async Task<IActionResult> GetUserById([FromRoute] Guid id)
         {
-            var user = await _userService.GetById(id);
-            if(user == null)
+            var user = await _userService.GetUserById(id);
+            if (user == null)
             {
                 return NotFound("User doesn't exist");
             }
             return Ok(user);
         }
 
-        [HttpGet("GetAll")]
+        [HttpGet("users")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUsers();
@@ -36,5 +37,109 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
             return NotFound("User doesn't exist");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateUser([FromBody] UserDTO user)
+        {
+            try
+            {
+                if (user == null)
+                {
+                    return BadRequest();
+                }
+
+                var usr = await _userService.GetUserByEmail(user.Email);
+
+                if(usr == null)
+                {
+                    ModelState.AddModelError("email", "User email already in use");
+                    return BadRequest(ModelState);
+                }
+                if (await _userService.AddUser(user))
+                {
+                    var createdUser = await _userService.GetUserByEmail(user.Email);
+                    return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+        "Error retrieving data from the database");
+                }
+
+                
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                        "Error retrieving data from the database");
+            }
+        }
+
+        [HttpPut("{id:Guid}")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserDTO userDTO)
+        {
+            try
+            {
+                if (userDTO.Id != userDTO.Id)
+                {
+                    return BadRequest("User ID mismatch");
+                }
+
+                var userToUpdate = await _userService.GetUserById(userDTO.Id);
+
+                if (userToUpdate == null)
+                {
+                    return NotFound($"User with ID = {userDTO.Id} not found");
+                }
+
+                if (await _userService.UpdateUser(userDTO))
+                {
+                    return Ok("User succesfully updated");
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                                        "Error updating data");
+                }
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                                  "Error updating data");
+            }
+        }
+
+        [HttpDelete("{id:Guid}")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            try
+            {
+                var userToDelete = await _userService.GetUserById(id);
+
+                if (userToDelete == null)
+                {
+                    return NotFound($"User with ID = {id} not found");
+                }
+
+                
+                if (await _userService.DeleteUser(id))
+                {
+                    return Ok("User succesfully deleted");
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                  "Error updating data");
+                }
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error deleting data");
+            }
+        }
+
     }
 }
