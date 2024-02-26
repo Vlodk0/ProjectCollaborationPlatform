@@ -6,18 +6,18 @@ using ProjectCollaborationPlatform.Domain.DTOs;
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
 
-    [Route("api/[contoller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
 
-        public ProjectController(IProjectService projectService)    
+        public ProjectController(IProjectService projectService)
         {
             _projectService = projectService;
         }
 
-        [HttpGet("{name}:string")]
+        [HttpGet("{name}")]
         public async Task<IActionResult> GetProjectByName([FromRoute] string name)
         {
             var project = await _projectService.GetProjectByName(name);
@@ -61,23 +61,17 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     var createdProject = await _projectService.GetProjectByName(project.Title);
                     return CreatedAtAction(nameof(GetProjectByName), new { title = createdProject.Title }, createdProject);
                 }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-        "Error retrieving data from the database");
-                }
 
 
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                        "Error retrieving data from the database");
-            }
+            catch { }
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Error retrieving data from the database");
         }
 
-        [HttpPut("{id:Guid}")]
-        public async Task<IActionResult> UpdateProject(ProjectDTO projectDTO)
+        [HttpPut]
+        public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO)
         {
             try
             {
@@ -97,21 +91,15 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     return Ok("Project updated succesfully");
                 }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                  "Error updating data");
-                }
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                  "Error updating data");
-            }
+            catch { }
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Error updating data");
         }
 
-        [HttpDelete("{name:string}")]
-        public async Task<ActionResult<Project>> DeleteProjectByName(string name)
+        [HttpDelete("{name}")]
+        public async Task<ActionResult<Project>> DeleteProjectByName([FromRoute] string name)
         {
             try
             {
@@ -126,17 +114,11 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     return Ok("Project deleted succesfully");
                 }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                        "Error deleting data");
-                }
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting data");
-            }
+            catch { }
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Error deleting data");
         }
 
     }

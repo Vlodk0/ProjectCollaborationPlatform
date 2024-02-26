@@ -5,7 +5,7 @@ using ProjectCollaborationPlatform.Domain.DTOs;
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
 
-    [Route("api/[contoller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -60,22 +60,16 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     var createdUser = await _userService.GetUserByEmail(user.Email);
                     return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
                 }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-        "Error retrieving data from the database");
-                }
 
                 
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                        "Error retrieving data from the database");
-            }
+            catch { }
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Error deleting data");
         }
 
-        [HttpPut("{id:Guid}")]
+        [HttpPut]
         public async Task<IActionResult> UpdateUser([FromBody] UserDTO userDTO)
         {
             try
@@ -96,22 +90,16 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     return Ok("User succesfully updated");
                 }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                                        "Error updating data");
-                }
 
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                  "Error updating data");
-            }
+            catch { }
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Error deleting data");
         }
 
         [HttpDelete("{id:Guid}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
         {
             try
             {
@@ -127,18 +115,12 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     return Ok("User succesfully deleted");
                 }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                  "Error updating data");
-                }
 
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting data");
-            }
+            catch { }
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                "Error deleting data");
         }
 
     }
