@@ -6,7 +6,7 @@ using ProjectCollaborationPlatform.Domain.DTOs;
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
 
-    [Route("api/[contoller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class BoardController : ControllerBase
     {
@@ -39,22 +39,15 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     var createdProject = await _boardService.GetBoardByName(board.Name);
                     return CreatedAtAction(nameof(GetBoardByName), new { title = createdProject.Name }, createdProject);
                 }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
+
+            }
+            catch { }
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
         "Error retrieving data from the database");
-                }
-
-
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                        "Error retrieving data from the database");
-            }
         }
 
-        [HttpGet("{name}:string")]
+        [HttpGet("{name}")]
         public async Task<IActionResult> GetBoardByName([FromRoute] string name)
         {
             var board = await _boardService.GetBoardByName(name);
@@ -65,8 +58,8 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return Ok(board);
         }
 
-        [HttpPut("{id:Guid}")]
-        public async Task<IActionResult> UpdateBoard(BoardDTO boardDTO)
+        [HttpPut]
+        public async Task<IActionResult> UpdateBoard([FromBody] BoardDTO boardDTO)
         {
             try
             {
@@ -86,46 +79,34 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     return Ok("Project updated succesfully");
                 }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                  "Error updating data");
-                }
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                                  "Error updating data");
-            }
+            catch { }
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error updating data");
         }
 
-        [HttpDelete("{name:string}")]
-        public async Task<ActionResult<Board>> DeleteBoardByName(BoardDTO board)
+        [HttpDelete("{name}")]
+        public async Task<ActionResult<Board>> DeleteBoardByName([FromRoute] string name)
         {
             try
             {
-                var boardToDelete = await _boardService.GetBoardByName(board.Name);
+                var boardToDelete = await _boardService.GetBoardByName(name);
 
                 if (boardToDelete == null)
                 {
-                    return NotFound($"Project with name = {board.Name} not found");
+                    return NotFound($"Board with name = {name} not found");
                 }
 
-                if (await _boardService.DeleteBoard(board.Id))
+                if (await _boardService.DeleteBoard(boardToDelete.Id))
                 {
-                    return Ok("Project deleted succesfully");
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                        "Error deleting data");
+                    return Ok("Board deleted succesfully");
                 }
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error deleting data");
-            }
+            catch { }
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                       "Error deleting data");
         }
     }
 }
