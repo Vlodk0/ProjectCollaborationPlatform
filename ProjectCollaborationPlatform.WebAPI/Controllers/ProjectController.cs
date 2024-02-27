@@ -23,9 +23,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             var project = await _projectService.GetProjectByName(name);
             if (project == null)
             {
-                return NotFound("Project with such name doesn't exist");
+                return StatusCode(StatusCodes.Status404NotFound, "Project with such name doesn't exist");
             }
-            return Ok(project);
+            return StatusCode(StatusCodes.Status404NotFound, project);
         }
 
         [HttpGet("projects")]
@@ -34,9 +34,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             var projects = await _projectService.GetAllProjects();
             if (projects != null || projects.Count != 0)
             {
-                return Ok(projects);
+                return StatusCode(StatusCodes.Status404NotFound, projects);
             }
-            return NotFound("Projects don't exist");
+            return StatusCode(StatusCodes.Status404NotFound, "Projects don't exist");
         }
 
         [HttpPost]
@@ -46,7 +46,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             {
                 if (project == null)
                 {
-                    return BadRequest();
+                    return StatusCode(StatusCodes.Status400BadRequest);
                 }
 
                 var prj = await _projectService.GetProjectById(project.Id);
@@ -54,7 +54,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 if (prj == null)
                 {
                     ModelState.AddModelError("id", "Project id already in use");
-                    return BadRequest(ModelState);
+                    return StatusCode(StatusCodes.Status400BadRequest, ModelState);
                 }
                 if (await _projectService.AddProject(project))
                 {
@@ -77,19 +77,19 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             {
                 if (projectDTO.Id != projectDTO.Id)
                 {
-                    return BadRequest("Project ID mismatch");
+                    return StatusCode(StatusCodes.Status400BadRequest, "Project ID mismatch");
                 }
 
                 var projectToUpdate = await _projectService.GetProjectById(projectDTO.Id);
 
                 if (projectToUpdate == null)
                 {
-                    return NotFound($"Project with ID = {projectDTO.Id} not found");
+                    return StatusCode(StatusCodes.Status404NotFound, $"Project with ID = {projectDTO.Id} not found");
                 }
 
                 if (await _projectService.UpdateProject(projectDTO))
                 {
-                    return Ok("Project updated succesfully");
+                    return StatusCode(StatusCodes.Status200OK, "Project updated succesfully");
                 }
             }
             catch { }
@@ -107,12 +107,12 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
                 if (projectToDelete == null)
                 {
-                    return NotFound($"Project with name = {name} not found");
+                    return StatusCode(StatusCodes.Status404NotFound, $"Project with name = {name} not found");
                 }
 
                 if (await _projectService.DeleteProjectByName(name))
                 {
-                    return Ok("Project deleted succesfully");
+                    return StatusCode(StatusCodes.Status200OK, "Project deleted succesfully");
                 }
             }
             catch { }

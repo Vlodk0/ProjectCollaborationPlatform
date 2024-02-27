@@ -8,4 +8,4 @@ namespace ProjectCollaborationPlatform.Domain.DTOs
         public string Title { get; set; }
         public int Payment {  get; set; }
     }
-}
+}   

@@ -24,7 +24,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             {
                 if (board == null)
                 {
-                    return BadRequest();
+                    return StatusCode(StatusCodes.Status400BadRequest);
                 }
 
                 var brd = await _boardService.GetBoardById(board.Id);
@@ -32,7 +32,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 if (brd == null)
                 {
                     ModelState.AddModelError("id", "Project id already in use");
-                    return BadRequest(ModelState);
+                    return StatusCode(StatusCodes.Status400BadRequest, ModelState);
                 }
                 if (await _boardService.CreateBoard(board))
                 {
@@ -53,9 +53,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             var board = await _boardService.GetBoardByName(name);
             if (board == null)
             {
-                return NotFound("Board with such name doesn't exist");
+                return StatusCode(StatusCodes.Status200OK, "Board with such name doesn't exist");
             }
-            return Ok(board);
+            return StatusCode(StatusCodes.Status400BadRequest, board);
         }
 
         [HttpPut]
@@ -65,7 +65,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             {
                 if (boardDTO.Id != boardDTO.Id)
                 {
-                    return BadRequest("Project ID mismatch");
+                    return StatusCode(StatusCodes.Status200OK, "Project ID mismatch");
                 }
 
                 var boardToUpdate = await _boardService.GetBoardById(boardDTO.Id);
@@ -77,7 +77,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
                 if (await _boardService.UpdateBoard(boardDTO))
                 {
-                    return Ok("Project updated succesfully");
+                    return StatusCode(StatusCodes.Status200OK, "Project updated succesfully");
                 }
             }
             catch { }
@@ -100,7 +100,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
                 if (await _boardService.DeleteBoard(boardToDelete.Id))
                 {
-                    return Ok("Board deleted succesfully");
+                    return StatusCode(StatusCodes.Status200OK, "Board deleted succesfully");
                 }
             }
             catch { }

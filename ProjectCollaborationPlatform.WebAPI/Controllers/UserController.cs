@@ -22,9 +22,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             var user = await _userService.GetUserById(id);
             if (user == null)
             {
-                return NotFound("User doesn't exist");
+                return StatusCode(StatusCodes.Status404NotFound, "User doesn't exist");
             }
-            return Ok(user);
+            return StatusCode(StatusCodes.Status400BadRequest, user);
         }
 
         [HttpGet("users")]
@@ -33,9 +33,10 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             var users = await _userService.GetAllUsers();
             if (users != null || users.Count != 0)
             {
-                return Ok(users);
+                return StatusCode(StatusCodes.Status404NotFound, users);
             }
-            return NotFound("User doesn't exist");
+            return StatusCode(StatusCodes.Status404NotFound, "User doesn't exist");
+
         }
 
         [HttpPost]
@@ -45,7 +46,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             {
                 if (user == null)
                 {
-                    return BadRequest();
+                    return StatusCode(StatusCodes.Status400BadRequest);
                 }
 
                 var usr = await _userService.GetUserByEmail(user.Email);
@@ -53,7 +54,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 if(usr == null)
                 {
                     ModelState.AddModelError("email", "User email already in use");
-                    return BadRequest(ModelState);
+                    return StatusCode(StatusCodes.Status400BadRequest, ModelState);
                 }
                 if (await _userService.AddUser(user))
                 {
@@ -76,19 +77,19 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             {
                 if (userDTO.Id != userDTO.Id)
                 {
-                    return BadRequest("User ID mismatch");
+                    return StatusCode(StatusCodes.Status400BadRequest, "User Id mismatch");
                 }
 
                 var userToUpdate = await _userService.GetUserById(userDTO.Id);
 
                 if (userToUpdate == null)
                 {
-                    return NotFound($"User with ID = {userDTO.Id} not found");
+                    return StatusCode(StatusCodes.Status404NotFound, $"User with ID = {userDTO.Id} not found");
                 }
 
                 if (await _userService.UpdateUser(userDTO))
                 {
-                    return Ok("User succesfully updated");
+                    return StatusCode(StatusCodes.Status200OK, "User succesfully updated");
                 }
 
             }
@@ -107,13 +108,13 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
                 if (userToDelete == null)
                 {
-                    return NotFound($"User with ID = {id} not found");
+                    return StatusCode(StatusCodes.Status404NotFound, $"User with ID = {id} not found");
                 }
 
                 
                 if (await _userService.DeleteUser(id))
                 {
-                    return Ok("User succesfully deleted");
+                    return StatusCode(StatusCodes.Status200OK, "User succesfully deleted");
                 }
 
             }
