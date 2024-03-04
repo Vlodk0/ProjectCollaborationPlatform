@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.BL.Services;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
+using System.Text;
 
 namespace ProjectCollaborationPlatform.WebAPI
 {
@@ -26,6 +29,31 @@ namespace ProjectCollaborationPlatform.WebAPI
                 option.UseSqlServer(builder.Configuration.GetConnectionString("db"));
             });
 
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = builder.Configuration["JWT:Issuer"],
+
+                        ValidateAudience = true,
+                        ValidAudience = builder.Configuration["JWT:Audience"],
+
+                        ValidateLifetime = true,
+
+                        ValidateIssuerSigningKey = true,
+                        ClockSkew = TimeSpan.Zero,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:SecretKey"])),
+                    };
+                });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -36,6 +64,8 @@ namespace ProjectCollaborationPlatform.WebAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

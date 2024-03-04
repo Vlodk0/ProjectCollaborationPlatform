@@ -36,14 +36,14 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveTaskAsync();
         }
 
-        public async Task<DAL.Data.Models.Task> GetTaskById(Guid id)
+        public async Task<DAL.Data.Models.Task> GetTaskById(Guid id, CancellationToken token)
         {
-            return await _context.Set<DAL.Data.Models.Task>().FindAsync(id);
+            return await _context.Set<DAL.Data.Models.Task>().FindAsync(id, token);
         }
 
-        public async Task<DAL.Data.Models.Task> GetTaskByName(string name)
+        public async Task<DAL.Data.Models.Task> GetTaskByName(string name, CancellationToken token)
         {
-            return await _context.Set<DAL.Data.Models.Task>().FindAsync(name);
+            return await _context.Set<DAL.Data.Models.Task>().FindAsync(name, token);
         }
 
         public async Task<bool> SaveTaskAsync()

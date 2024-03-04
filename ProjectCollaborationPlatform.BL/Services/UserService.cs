@@ -19,9 +19,8 @@ namespace ProjectCollaborationPlatform.BL.Services
         {
             var user = new User()
             {
-                Name = userDTO.Name,
                 Email = userDTO.Email,
-                Password = userDTO.Password,
+                RoleName = userDTO.RoleName,
                 IsDeleted = false,
             };
             _context.Set<User>().Add(user);
@@ -30,17 +29,14 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<bool> DeleteUser(Guid id)
         {
-            var user = await GetUserById(id);
+            var user = await _context.Set<User>().FindAsync(id);
             if (user == null)
             {
                 return false;
             }
             var deletedUser = new User()
             {
-                Name = user.Name,
-                Surname = user.Surname,
                 Email = user.Email,
-                Password = user.Password,
                 IsDeleted = true,
                 RoleName = user.RoleName,
             };
@@ -50,19 +46,19 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveUserAsync();
         }
 
-        public async Task<List<User>> GetAllUsers()
+        public async Task<List<User>> GetAllUsers(CancellationToken token)
         {
-            return await _context.Set<User>().ToListAsync();
+            return await _context.Set<User>().ToListAsync(token);
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<User> GetUserByEmail(string email, CancellationToken token)
         {
-            return await _context.Set<User>().FindAsync(email);
+            return await _context.Users.Where(e => e.Email == email).FirstOrDefaultAsync(token);
         }
 
-        public async Task<User> GetUserById(Guid id)
+        public async Task<User> GetUserById(Guid id, CancellationToken token)
         {
-            return await _context.Set<User>().FindAsync(id);
+            return await _context.Users.Where(i => i.Id == id).FirstOrDefaultAsync(token);
 
         }
 
@@ -77,9 +73,7 @@ namespace ProjectCollaborationPlatform.BL.Services
             var user = await _context.Users.Where(e => e.Email == userDTO.Email).FirstOrDefaultAsync();
             user = new User()
             {
-                Name = userDTO.Name,
                 Email = userDTO.Email,
-                Password = userDTO.Password,
             };
             _context.Users.Update(user);
             return await SaveUserAsync();

@@ -53,19 +53,19 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveProjectAsync();
         }
 
-        public async Task<List<Project>> GetAllProjects()
+        public async Task<List<Project>> GetAllProjects(CancellationToken token)
         {
-            return await _context.Set<Project>().ToListAsync();
+            return await _context.Set<Project>().ToListAsync(token);
         }
 
-        public async Task<Project> GetProjectById(Guid id)
+        public async Task<Project> GetProjectById(Guid id, CancellationToken token)
         {
-            return await _context.Set<Project>().FindAsync(id);
+            return await _context.Set<Project>().FindAsync(id, token);
         }
 
-        public async Task<Project> GetProjectByName(string name)
+        public async Task<Project> GetProjectByName(string name, CancellationToken token)
         {
-            return await _context.Set<Project>().FindAsync(name);
+            return await _context.Set<Project>().FindAsync(name, token);
         }
 
         public async Task<bool> SaveProjectAsync()

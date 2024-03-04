@@ -37,14 +37,14 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveFunctionalityBlockAsync();
         }
 
-        public async Task<FunctionalityBlock> GetFunctionalityBlockById(Guid id)
+        public async Task<FunctionalityBlock> GetFunctionalityBlockById(Guid id, CancellationToken token)
         {
-            return await _context.Set<FunctionalityBlock>().FindAsync(id);
+            return await _context.Set<FunctionalityBlock>().FindAsync(id, token);
         }
 
-        public async Task<FunctionalityBlock> GetFunctionalityBlockByName(string name)
+        public async Task<FunctionalityBlock> GetFunctionalityBlockByName(string name, CancellationToken token)
         {
-            return await _context.Set<FunctionalityBlock>().FindAsync(name);
+            return await _context.Set<FunctionalityBlock>().FindAsync(name, token);
         }
 
         public async Task<bool> SaveFunctionalityBlockAsync()

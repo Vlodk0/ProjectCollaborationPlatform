@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using System.Security.Claims;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
 
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -17,9 +19,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpGet("{id:Guid}")]
-        public async Task<IActionResult> GetUserById([FromRoute] Guid id)
+        public async Task<IActionResult> GetUserById([FromRoute] Guid id, CancellationToken token)
         {
-            var user = await _userService.GetUserById(id);
+            var user = await _userService.GetUserById(id, token);
             if (user == null)
             {
                 return StatusCode(StatusCodes.Status404NotFound, "User doesn't exist");
@@ -28,9 +30,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpGet("users")]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers(CancellationToken token)
         {
-            var users = await _userService.GetAllUsers();
+            var users = await _userService.GetAllUsers(token);
             if (users != null || users.Count != 0)
             {
                 return StatusCode(StatusCodes.Status404NotFound, users);
@@ -39,26 +41,33 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         }
 
+        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] UserDTO user)
+        public async Task<IActionResult> CreateUser(CancellationToken token)
         {
             try
             {
+                var user = new UserDTO()
+                {
+                    Id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)),
+                    RoleName = HttpContext.User.FindFirstValue(ClaimTypes.Role),
+                    Email = HttpContext.User.FindFirstValue(ClaimTypes.Email)
+                };
                 if (user == null)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest);
                 }
 
-                var usr = await _userService.GetUserByEmail(user.Email);
+                var usr = await _userService.GetUserByEmail(user.Email, token);
 
-                if(usr == null)
+                if(usr != null)
                 {
                     ModelState.AddModelError("email", "User email already in use");
                     return StatusCode(StatusCodes.Status400BadRequest, ModelState);
                 }
                 if (await _userService.AddUser(user))
                 {
-                    var createdUser = await _userService.GetUserByEmail(user.Email);
+                    var createdUser = await _userService.GetUserByEmail(user.Email, token);
                     return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
                 }
 
@@ -67,11 +76,11 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             catch { }
 
             return StatusCode(StatusCodes.Status500InternalServerError,
-                "Error deleting data");
+                "Server Error");
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateUser([FromBody] UserDTO userDTO)
+        public async Task<IActionResult> UpdateUser([FromBody] UserDTO userDTO, CancellationToken token)
         {
             try
             {
@@ -80,7 +89,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest, "User Id mismatch");
                 }
 
-                var userToUpdate = await _userService.GetUserById(userDTO.Id);
+                var userToUpdate = await _userService.GetUserById(userDTO.Id, token);
 
                 if (userToUpdate == null)
                 {
@@ -96,15 +105,15 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             catch { }
 
             return StatusCode(StatusCodes.Status500InternalServerError,
-                "Error deleting data");
+                "Server Error");
         }
 
         [HttpDelete("{id:Guid}")]
-        public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteUser([FromRoute] Guid id, CancellationToken token)
         {
             try
             {
-                var userToDelete = await _userService.GetUserById(id);
+                var userToDelete = await _userService.GetUserById(id, token);
 
                 if (userToDelete == null)
                 {
@@ -121,7 +130,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             catch { }
 
             return StatusCode(StatusCodes.Status500InternalServerError,
-                "Error deleting data");
+                "Server Error");
         }
 
     }

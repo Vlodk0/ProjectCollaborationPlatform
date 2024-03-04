@@ -18,7 +18,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBoard([FromBody] BoardDTO board)
+        public async Task<IActionResult> CreateBoard([FromBody] BoardDTO board, CancellationToken token)
         {
             try
             {
@@ -27,7 +27,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest);
                 }
 
-                var brd = await _boardService.GetBoardById(board.Id);
+                var brd = await _boardService.GetBoardById(board.Id, token);
 
                 if (brd == null)
                 {
@@ -36,7 +36,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 }
                 if (await _boardService.CreateBoard(board))
                 {
-                    var createdProject = await _boardService.GetBoardByName(board.Name);
+                    var createdProject = await _boardService.GetBoardByName(board.Name, token);
                     return CreatedAtAction(nameof(GetBoardByName), new { title = createdProject.Name }, createdProject);
                 }
 
@@ -48,9 +48,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpGet("{name}")]
-        public async Task<IActionResult> GetBoardByName([FromRoute] string name)
+        public async Task<IActionResult> GetBoardByName([FromRoute] string name, CancellationToken token)
         {
-            var board = await _boardService.GetBoardByName(name);
+            var board = await _boardService.GetBoardByName(name, token);
             if (board == null)
             {
                 return StatusCode(StatusCodes.Status200OK, "Board with such name doesn't exist");
@@ -59,7 +59,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateBoard([FromBody] BoardDTO boardDTO)
+        public async Task<IActionResult> UpdateBoard([FromBody] BoardDTO boardDTO, CancellationToken token)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     return StatusCode(StatusCodes.Status200OK, "Project ID mismatch");
                 }
 
-                var boardToUpdate = await _boardService.GetBoardById(boardDTO.Id);
+                var boardToUpdate = await _boardService.GetBoardById(boardDTO.Id, token);
 
                 if (boardToUpdate == null)
                 {
@@ -87,11 +87,11 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpDelete("{name}")]
-        public async Task<ActionResult<Board>> DeleteBoardByName([FromRoute] string name)
+        public async Task<ActionResult<Board>> DeleteBoardByName([FromRoute] string name, CancellationToken token)
         {
             try
             {
-                var boardToDelete = await _boardService.GetBoardByName(name);
+                var boardToDelete = await _boardService.GetBoardByName(name, token);
 
                 if (boardToDelete == null)
                 {

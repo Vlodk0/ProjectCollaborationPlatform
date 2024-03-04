@@ -18,9 +18,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpGet("{name}")]
-        public async Task<IActionResult> GetProjectByName([FromRoute] string name)
+        public async Task<IActionResult> GetProjectByName([FromRoute] string name, CancellationToken token)
         {
-            var project = await _projectService.GetProjectByName(name);
+            var project = await _projectService.GetProjectByName(name, token);
             if (project == null)
             {
                 return StatusCode(StatusCodes.Status404NotFound, "Project with such name doesn't exist");
@@ -29,9 +29,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpGet("projects")]
-        public async Task<IActionResult> GetAllProjects()
+        public async Task<IActionResult> GetAllProjects(CancellationToken token)
         {
-            var projects = await _projectService.GetAllProjects();
+            var projects = await _projectService.GetAllProjects(token);
             if (projects != null || projects.Count != 0)
             {
                 return StatusCode(StatusCodes.Status404NotFound, projects);
@@ -40,7 +40,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProject([FromBody] ProjectDTO project)
+        public async Task<IActionResult> CreateProject([FromBody] ProjectDTO project, CancellationToken token)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest);
                 }
 
-                var prj = await _projectService.GetProjectById(project.Id);
+                var prj = await _projectService.GetProjectById(project.Id, token);
 
                 if (prj == null)
                 {
@@ -58,7 +58,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 }
                 if (await _projectService.AddProject(project))
                 {
-                    var createdProject = await _projectService.GetProjectByName(project.Title);
+                    var createdProject = await _projectService.GetProjectByName(project.Title, token);
                     return CreatedAtAction(nameof(GetProjectByName), new { title = createdProject.Title }, createdProject);
                 }
 
@@ -71,7 +71,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO)
+        public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, CancellationToken token)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest, "Project ID mismatch");
                 }
 
-                var projectToUpdate = await _projectService.GetProjectById(projectDTO.Id);
+                var projectToUpdate = await _projectService.GetProjectById(projectDTO.Id, token);
 
                 if (projectToUpdate == null)
                 {
@@ -99,11 +99,11 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpDelete("{name}")]
-        public async Task<ActionResult<Project>> DeleteProjectByName([FromRoute] string name)
+        public async Task<ActionResult<Project>> DeleteProjectByName([FromRoute] string name, CancellationToken token)
         {
             try
             {
-                var projectToDelete = await _projectService.GetProjectByName(name);
+                var projectToDelete = await _projectService.GetProjectByName(name, token);
 
                 if (projectToDelete == null)
                 {

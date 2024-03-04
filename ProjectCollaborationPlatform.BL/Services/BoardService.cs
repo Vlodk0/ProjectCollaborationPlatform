@@ -39,14 +39,14 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveBoardAsync();
         }
 
-        public async Task<Board> GetBoardById(Guid id)
+        public async Task<Board> GetBoardById(Guid id, CancellationToken token)
         {
-            return await _context.Set<Board>().FindAsync(id);
+            return await _context.Set<Board>().FindAsync(id, token);
         }
 
-        public async Task<Board> GetBoardByName(string name)
+        public async Task<Board> GetBoardByName(string name, CancellationToken token)
         {
-            return await _context.Set<Board>().FindAsync(name);
+            return await _context.Set<Board>().FindAsync(name, token);
         }
 
         public async Task<bool> SaveBoardAsync()
