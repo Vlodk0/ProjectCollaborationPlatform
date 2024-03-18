@@ -1,4 +1,6 @@
 ﻿
+using ProjectCollaborationPlatform.DAL.Models;
+
 namespace ProjectCollaborationPlatform.DAL.Data.Models
 {
     public class User : BaseEntity
@@ -6,5 +8,6 @@ namespace ProjectCollaborationPlatform.DAL.Data.Models
         public string Email { get; set; }
         public bool IsDeleted { get; set; }
         public string RoleName { get; set; }
+        public PhotoFile PhotoFile { get; set; }
     }
 }
