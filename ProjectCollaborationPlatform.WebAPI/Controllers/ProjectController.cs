@@ -2,6 +2,7 @@
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
@@ -23,103 +24,136 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             var project = await _projectService.GetProjectByName(name, token);
             if (project == null)
             {
-                return StatusCode(StatusCodes.Status404NotFound, "Project with such name doesn't exist");
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project not found",
+                    Detail = "Project with such name doesn't exist"
+                };
             }
-            return StatusCode(StatusCodes.Status404NotFound, project);
+            return StatusCode(StatusCodes.Status200OK, project);
         }
 
-        [HttpGet("projects")]
-        public async Task<IActionResult> GetAllProjects(CancellationToken token)
-        {
-            var projects = await _projectService.GetAllProjects(token);
-            if (projects != null || projects.Count != 0)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, projects);
-            }
-            return StatusCode(StatusCodes.Status404NotFound, "Projects don't exist");
-        }
+        //[HttpGet("projects")]
+        //public async Task<IActionResult> GetAllProjects(CancellationToken token)
+        //{
+        //    var projects = await _projectService.GetAllProjects(token);
+        //    if (projects != null || projects.Count != 0)
+        //    {
+        //        return StatusCode(StatusCodes.Status200OK, projects);
+        //    }
+        //    else
+        //    {
+        //        throw new CustomApiException()
+        //        {
+        //            StatusCode = StatusCodes.Status404NotFound,
+        //            Title = "Projects not found",
+        //            Detail = "Projects don't exist"
+        //        };
+        //    }
+        //}
 
         [HttpPost]
         public async Task<IActionResult> CreateProject([FromBody] ProjectDTO project, CancellationToken token)
         {
-            try
+            if (project == null)
             {
-                if (project == null)
+                throw new CustomApiException()
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest);
-                }
-
-                var prj = await _projectService.GetProjectById(project.Id, token);
-
-                if (prj == null)
-                {
-                    ModelState.AddModelError("id", "Project id already in use");
-                    return StatusCode(StatusCodes.Status400BadRequest, ModelState);
-                }
-                if (await _projectService.AddProject(project))
-                {
-                    var createdProject = await _projectService.GetProjectByName(project.Title, token);
-                    return CreatedAtAction(nameof(GetProjectByName), new { title = createdProject.Title }, createdProject);
-                }
-
-
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Title = "Bad request",
+                    Detail = "Can't create a project"
+                };
             }
-            catch { }
 
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                "Error retrieving data from the database");
+            var prj = await _projectService.GetProjectById(project.Id, token);
+
+            if (prj != null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Title = "Error creating project",
+                    Detail = "Project is already exist"
+                };
+            }
+            if (await _projectService.AddProject(project))
+            {
+                var createdProject = await _projectService.GetProjectByName(project.Title, token);
+                return Created("api/project", createdProject);
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while server running"
+                };
+            }
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, CancellationToken token)
         {
-            try
+
+            var projectToUpdate = await _projectService.GetProjectById(projectDTO.Id, token);
+
+            if (projectToUpdate == null)
             {
-                if (projectDTO.Id != projectDTO.Id)
+                throw new CustomApiException()
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, "Project ID mismatch");
-                }
-
-                var projectToUpdate = await _projectService.GetProjectById(projectDTO.Id, token);
-
-                if (projectToUpdate == null)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, $"Project with ID = {projectDTO.Id} not found");
-                }
-
-                if (await _projectService.UpdateProject(projectDTO))
-                {
-                    return StatusCode(StatusCodes.Status200OK, "Project updated succesfully");
-                }
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Projects not found",
+                    Detail = $"Project with {projectDTO.Id} id not found"
+                };
             }
-            catch { }
 
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                "Error updating data");
+            if (await _projectService.UpdateProject(projectDTO))
+            {
+                return StatusCode(StatusCodes.Status200OK, "Project updated succesfully");
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while server running"
+                };
+            }
         }
+
 
         [HttpDelete("{name}")]
         public async Task<ActionResult<Project>> DeleteProjectByName([FromRoute] string name, CancellationToken token)
         {
-            try
+            var projectToDelete = await _projectService.GetProjectByName(name, token);
+
+            if (projectToDelete == null)
             {
-                var projectToDelete = await _projectService.GetProjectByName(name, token);
-
-                if (projectToDelete == null)
+                throw new CustomApiException()
                 {
-                    return StatusCode(StatusCodes.Status404NotFound, $"Project with name = {name} not found");
-                }
-
-                if (await _projectService.DeleteProjectByName(name))
-                {
-                    return StatusCode(StatusCodes.Status200OK, "Project deleted succesfully");
-                }
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Projects not found",
+                    Detail = $"Project with such name: {name}, not found"
+                }; ;
             }
-            catch { }
 
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                "Error deleting data");
+            if (await _projectService.DeleteProjectByName(name))
+            {
+                return StatusCode(StatusCodes.Status200OK, "Project deleted succesfully");
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while server running"
+                };
+            }
         }
-
     }
 }
+

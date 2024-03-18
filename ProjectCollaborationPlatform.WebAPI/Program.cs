@@ -4,6 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.BL.Services;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
+using ProjectCollaborationPlatform.WebAPI.Helpers.ErrorFilter;
+using Serilog;
 using System.Text;
 
 namespace ProjectCollaborationPlatform.WebAPI
@@ -16,10 +18,17 @@ namespace ProjectCollaborationPlatform.WebAPI
 
             // Add services to the container.
 
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add(typeof(CustomExceptionFilter));
+            });
+
             builder.Services.AddControllers();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<IBoardService, BoardService>();
+            builder.Services.AddScoped<ITeamService, TeamService>();
+            builder.Services.AddTransient<IPhotoManageService, PhotoManageService>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -54,6 +63,9 @@ namespace ProjectCollaborationPlatform.WebAPI
                     };
                 });
 
+            builder.Host.UseSerilog((context, configuration) =>
+                    configuration.ReadFrom.Configuration(context.Configuration));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -62,8 +74,14 @@ namespace ProjectCollaborationPlatform.WebAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+            }
 
             app.UseHttpsRedirection();
+
+            app.UseSerilogRequestLogging();
 
             app.UseAuthentication();
 

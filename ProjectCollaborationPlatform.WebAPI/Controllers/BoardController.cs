@@ -2,6 +2,7 @@
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
@@ -20,93 +21,120 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBoard([FromBody] BoardDTO board, CancellationToken token)
         {
-            try
+            if (board == null)
             {
-                if (board == null)
+                throw new CustomApiException()
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest);
-                }
-
-                var brd = await _boardService.GetBoardById(board.Id, token);
-
-                if (brd == null)
-                {
-                    ModelState.AddModelError("id", "Project id already in use");
-                    return StatusCode(StatusCodes.Status400BadRequest, ModelState);
-                }
-                if (await _boardService.CreateBoard(board))
-                {
-                    var createdProject = await _boardService.GetBoardByName(board.Name, token);
-                    return CreatedAtAction(nameof(GetBoardByName), new { title = createdProject.Name }, createdProject);
-                }
-
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Title = "Bad request",
+                    Detail = "Can't create a board"
+                };
             }
-            catch { }
 
-            return StatusCode(StatusCodes.Status500InternalServerError,
-        "Error retrieving data from the database");
+            var brd = await _boardService.GetBoardById(board.Id, token);
+
+            if (brd != null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Title = "Error creating the board",
+                    Detail = "Board is already in use"
+                };
+            }
+            if (await _boardService.CreateBoard(board))
+            {
+                var createdProject = await _boardService.GetBoardByName(board.Name, token);
+                return Created("api/board", createdProject);
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while server running"
+                };
+            }
         }
 
         [HttpGet("{name}")]
         public async Task<IActionResult> GetBoardByName([FromRoute] string name, CancellationToken token)
         {
             var board = await _boardService.GetBoardByName(name, token);
-            if (board == null)
+            if (board != null)
             {
-                return StatusCode(StatusCodes.Status200OK, "Board with such name doesn't exist");
+                return StatusCode(StatusCodes.Status200OK, board);
             }
-            return StatusCode(StatusCodes.Status400BadRequest, board);
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Board not found",
+                    Detail = "Board with such name doesn't exist"
+                };
+            }
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateBoard([FromBody] BoardDTO boardDTO, CancellationToken token)
         {
-            try
+            var boardToUpdate = await _boardService.GetBoardById(boardDTO.Id, token);
+
+            if (boardToUpdate == null)
             {
-                if (boardDTO.Id != boardDTO.Id)
+                throw new CustomApiException()
                 {
-                    return StatusCode(StatusCodes.Status200OK, "Project ID mismatch");
-                }
-
-                var boardToUpdate = await _boardService.GetBoardById(boardDTO.Id, token);
-
-                if (boardToUpdate == null)
-                {
-                    return NotFound($"Project with ID = {boardDTO.Id} not found");
-                }
-
-                if (await _boardService.UpdateBoard(boardDTO))
-                {
-                    return StatusCode(StatusCodes.Status200OK, "Project updated succesfully");
-                }
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Board not found",
+                    Detail = $"Board with {boardDTO.Id} id doesn't exist"
+                };
             }
-            catch { }
 
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Error updating data");
+            if (await _boardService.UpdateBoard(boardDTO))
+            {
+                return StatusCode(StatusCodes.Status200OK, "Project updated succesfully");
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while server running"
+                };
+            }
         }
 
         [HttpDelete("{name}")]
         public async Task<ActionResult<Board>> DeleteBoardByName([FromRoute] string name, CancellationToken token)
         {
-            try
+            var boardToDelete = await _boardService.GetBoardByName(name, token);
+
+            if (boardToDelete == null)
             {
-                var boardToDelete = await _boardService.GetBoardByName(name, token);
-
-                if (boardToDelete == null)
+                throw new CustomApiException()
                 {
-                    return NotFound($"Board with name = {name} not found");
-                }
-
-                if (await _boardService.DeleteBoard(boardToDelete.Id))
-                {
-                    return StatusCode(StatusCodes.Status200OK, "Board deleted succesfully");
-                }
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Board not found",
+                    Detail = "Board with such name doesn't exist"
+                };
             }
-            catch { }
 
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                       "Error deleting data");
+            if (await _boardService.DeleteBoard(boardToDelete.Id))
+            {
+                return StatusCode(StatusCodes.Status200OK, "Board deleted succesfully");
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while server running"
+                };
+            }
         }
     }
 }
