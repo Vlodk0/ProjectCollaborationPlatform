@@ -1,8 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Helpers;
+using ProjectCollaborationPlatform.Domain.Pagination;
 using System.Xml.Linq;
 
 namespace ProjectCollaborationPlatform.BL.Services
@@ -53,19 +56,65 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveProjectAsync();
         }
 
-        public async Task<List<Project>> GetAllProjects(CancellationToken token)
+        public async Task<PagedResponse<List<ProjectDTO>>> GetAllProjects(PaginationFilter filter, CancellationToken token)
         {
-            return await _context.Set<Project>().ToListAsync(token);
+            IQueryable<ProjectDTO> projects;
+            projects = _context.Projects
+                .Where(p => p.Payment == filter.Payment)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(p => new ProjectDTO
+                {
+                    Id = p.Id,
+                    Payment = p.Payment,
+                    Title = p.Title
+                });
+
+            if (projects == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Projects not found",
+                    Detail = "Projects don't exist"
+                };
+            }
+
+            var result = await projects.ToListAsync(token);
+
+            return new PagedResponse<List<ProjectDTO>>(result, filter.PageNumber, filter.PageSize);
         }
 
-        public async Task<Project> GetProjectById(Guid id, CancellationToken token)
+        public async Task<ProjectDTO> GetProjectById(Guid id, CancellationToken token)
         {
-            return await _context.Set<Project>().FindAsync(id, token);
+            var project = await _context.Projects.Where(i => i.Id == id).FirstOrDefaultAsync(token);
+
+            if (project == null)
+            {
+                return null;
+            }
+
+            return new ProjectDTO()
+            {
+                Id = project.Id,
+                Title = project.Title,
+            };
         }
 
-        public async Task<Project> GetProjectByName(string name, CancellationToken token)
+        public async Task<ProjectDTO> GetProjectByName(string name, CancellationToken token)
         {
-            return await _context.Set<Project>().FindAsync(name, token);
+            var project = await _context.Projects.Where(t => t.Title == name).FirstOrDefaultAsync(token);
+
+            if (project == null)
+            {
+                return null;
+            }
+
+            return new ProjectDTO()
+            {
+                Id = project.Id,
+                Title = project.Title,
+            };
         }
 
         public async Task<bool> SaveProjectAsync()

@@ -39,20 +39,42 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveBoardAsync();
         }
 
-        public async Task<Board> GetBoardById(Guid id, CancellationToken token)
+        public async Task<BoardDTO> GetBoardById(Guid id, CancellationToken token)
         {
-            return await _context.Set<Board>().FindAsync(id, token);
+            var board = await _context.Boards.Where(i => i.Id == id).FirstOrDefaultAsync(token);
+
+            if (board == null)
+            {
+                return null;
+            }
+
+            return new BoardDTO()
+            {
+                Id = board.Id,
+                Name = board.Name,
+            };
         }
 
-        public async Task<Board> GetBoardByName(string name, CancellationToken token)
+        public async Task<BoardDTO> GetBoardByName(string name, CancellationToken token)
         {
-            return await _context.Set<Board>().FindAsync(name, token);
+            var board = await _context.Boards.Where(i => i.Name == name).FirstOrDefaultAsync(token);
+
+            if (board == null)
+            {
+                return null;
+            }
+
+            return new BoardDTO()
+            {
+                Id = board.Id,
+                Name = board.Name,
+            };
         }
 
         public async Task<bool> SaveBoardAsync()
         {
             var saved = await _context.SaveChangesAsync();
-            return saved > 0 ? true : false;
+            return saved > 0;
         }
 
         public async Task<bool> UpdateBoard(BoardDTO boardDTO)
