@@ -4,8 +4,8 @@ namespace ProjectCollaborationPlatform.Domain.DTOs
 {
     public class TeamDeveloperIdDTO
     {
-        public Guid developerId { get; set; }
-        public Guid teamId { get; set; }
+        public Guid DeveloperId { get; set; }
+        public Guid TeamId { get; set; }
     }
 }
     
