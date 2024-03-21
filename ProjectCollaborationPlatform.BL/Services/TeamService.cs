@@ -25,10 +25,10 @@ namespace ProjectCollaborationPlatform.BL.Services
                 return false;
             }
 
-            var developerIds = developerIdDTO.Select(dto => dto.developerId).ToList();
+            var developerIds = developerIdDTO.Select(dto => dto.DeveloperId).ToList();
 
             var addedDevelopers = await _context.Developers
-                                                .Where(d => developerIds.Contains(d.Id))
+                                                .Where(d => developerIds.Contains(d.Id))    
                                                 .ToListAsync();
 
             var teamDevelopersToAdd = addedDevelopers.Select(developer => new TeamDeveloper
@@ -54,7 +54,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                 return false;
             }
 
-            var developersToRemove = teamDeveloperIdDTO.Select(dto => dto.developerId).ToList();
+            var developersToRemove = teamDeveloperIdDTO.Select(dto => dto.DeveloperId).ToList();
 
             if (developersToRemove == null)
             {
@@ -80,6 +80,32 @@ namespace ProjectCollaborationPlatform.BL.Services
         {
             var saved = await _context.SaveChangesAsync();
             return saved > 0;
+        }
+
+        public async Task<bool> CreateTeam(TeamDTO teamDTO)
+        {
+            var team = new Team
+            {
+                Members = teamDTO.Members,
+            };
+            _context.Set<Team>().Add(team);
+            return await SaveTeamAsync();
+        }
+
+        public async Task<TeamDTO> GetTeamById(Guid Id, CancellationToken token)
+        {
+            var team = await _context.Teams.Where(i => i.Id == Id).FirstOrDefaultAsync(token);
+
+            if (team == null)
+            {
+                return null;
+            }
+
+            return new TeamDTO()
+            {
+                Id = team.Id,
+                Members = team.Members,
+            };
         }
     }
 }

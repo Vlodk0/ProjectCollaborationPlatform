@@ -66,13 +66,13 @@ namespace ProjectCollaborationPlatform.BL.Services
             }
         }
 
-        private async Task<bool> CreateFile(string fileName, string _getFilePath, Guid userId)
+        private async Task<bool> CreateFile(string fileName, string _getFilePath, Guid developerID)
         {
             var photo = new PhotoFile
             {
                 Name = fileName,
                 Path = _getFilePath,
-                UserId = userId
+                DeveloperId = developerID
             };
             await _context.PhotoFiles.AddAsync(photo);
             var isSaved = await SaveAsync();
