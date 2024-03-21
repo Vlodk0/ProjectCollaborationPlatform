@@ -24,7 +24,8 @@ namespace ProjectCollaborationPlatform.WebAPI
             });
 
             builder.Services.AddControllers();
-            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IDeveloperService, DeveloperService>();
+            builder.Services.AddScoped<IProjectOwnerService, ProjectOwnerService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<IBoardService, BoardService>();
             builder.Services.AddScoped<ITeamService, TeamService>();
