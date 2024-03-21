@@ -11,7 +11,8 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess.Configurations
         {
             builder
                 .HasMany(p => p.Projects)
-                .WithOne(po => po.ProjectOwner);
+                .WithOne(po => po.ProjectOwner)
+                .OnDelete(DeleteBehavior.Restrict);
             builder
                 .HasKey(p => p.Id);
         }

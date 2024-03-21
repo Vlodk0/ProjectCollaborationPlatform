@@ -2,7 +2,7 @@
 
 namespace ProjectCollaborationPlatform.DAL.Data.Models
 {
-    public class TeamDeveloper : BaseEntity
+    public class TeamDeveloper
     {
         public Guid DeveloperID { get; set; }
         public Developer Developer { get; set; }

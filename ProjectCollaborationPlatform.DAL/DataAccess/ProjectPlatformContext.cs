@@ -20,8 +20,8 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamDeveloper> TeamDevelopers { get; set; }
         public DbSet<Technology> Technologies { get; set; }
-        public DbSet<User> Users { get; set; }
         public DbSet<PhotoFile> PhotoFiles { get; set; }
+        public DbSet<ProjectOwner> ProjectOwners { get; set; }
 
         public ProjectPlatformContext()
         {
@@ -45,6 +45,8 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
             builder.ApplyConfiguration(new ProjectTechnologyConfiguration()); 
             builder.ApplyConfiguration(new TeamDeveloperConfiguration()); 
             builder.ApplyConfiguration(new PhotoFileConfiguration()); 
+            builder.ApplyConfiguration(new DeveloperConfiguration());
+            builder.ApplyConfiguration(new ProjectOwnerConfiguration());
             base.OnModelCreating(builder);
         }
 

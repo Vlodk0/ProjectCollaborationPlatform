@@ -11,6 +11,7 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess.Configurations
             builder
                 .HasKey(x => x.Id);
 
+
         }
     }
 }
