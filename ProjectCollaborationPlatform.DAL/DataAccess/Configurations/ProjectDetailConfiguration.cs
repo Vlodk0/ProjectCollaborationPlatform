@@ -10,10 +10,6 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess.Configurations
         public void Configure(EntityTypeBuilder<ProjectDetail> builder)
         {
             builder
-                .HasOne(p => p.Project)
-                .WithOne(pr => pr.ProjectDetail)
-                .HasForeignKey<Project>(p => p.ProjectDetailID);
-            builder
                 .HasKey(i => i.Id);
                 
         }

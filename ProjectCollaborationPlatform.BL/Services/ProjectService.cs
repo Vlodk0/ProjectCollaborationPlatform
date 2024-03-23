@@ -19,14 +19,38 @@ namespace ProjectCollaborationPlatform.BL.Services
             _context = context;
         }
 
-        public async Task<bool> AddProject(ProjectDTO projectDTO)
+        public async Task<bool> AddProject(ProjectFullInfoDTO projectDTO, Guid id, CancellationToken token)
         {
             var project = new Project()
             {
                 Title = projectDTO.Title,
                 Payment = projectDTO.Payment,
+                ProjectOwnerID = id,
             };
-            _context.Set<Project>().Add(project);
+
+            _context.Projects.Add(project);
+            if (!await SaveProjectAsync())
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while creating project"
+                };
+            }
+
+            var title = await _context.Projects.Where(p => p.Title == projectDTO.Title).FirstOrDefaultAsync(token);
+            return await AddProjectDetails(title.Id, projectDTO.Description);
+        }
+
+        private async Task<bool> AddProjectDetails(Guid id, string description)
+        {
+            var projectDetails = new ProjectDetail()
+            {
+                ProjectID = id,
+                Description = description,
+            };
+            _context.ProjectDetails.Add(projectDetails);
             return await SaveProjectAsync();
         }
 
@@ -95,8 +119,8 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             return new ProjectDTO()
             {
-                Id = project.Id,
                 Title = project.Title,
+                Payment = project.Payment,
             };
         }
 
@@ -111,26 +135,45 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             return new ProjectDTO()
             {
-                Id = project.Id,
                 Title = project.Title,
+                Payment = project.Payment
             };
         }
 
         public async Task<bool> SaveProjectAsync()
         {
-            var saved = await _context.SaveChangesAsync();
-            return saved > 0 ? true : false;
+            try
+            {
+                var saved = await _context.SaveChangesAsync();
+                return saved > 0 ? true : false;
+            }
+            catch (Exception ex)
+            {
+                throw new CustomApiException
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Error",
+                    Detail = ex.Message
+                };
+            }
         }
 
-        public async Task<bool> UpdateProject(ProjectDTO projectDTO)
+        public async Task<bool> UpdateProject(ProjectDTO projectDTO, Guid id)
         {
-            var project = await _context.Projects.Where(e => e.Title == projectDTO.Title).FirstOrDefaultAsync();
-            project = new Project()
-            {
-                Title = projectDTO.Title,
-                Payment = projectDTO.Payment,
-            };
+            var project = await _context.Projects.Where(e => e.Id == id).FirstOrDefaultAsync();
+
+            project.Title = projectDTO.Title;
+            project.Payment = projectDTO.Payment;
             _context.Projects.Update(project);
+            return await SaveProjectAsync();
+        }
+
+        public async Task<bool> UpdateProjectDetails(Guid id, string description)
+        {
+            var projectDetail = await _context.ProjectDetails.Where(e => e.ProjectID == id).FirstOrDefaultAsync();
+
+            projectDetail.Description = description;
+            _context.ProjectDetails.Update(projectDetail);
             return await SaveProjectAsync();
         }
     }
