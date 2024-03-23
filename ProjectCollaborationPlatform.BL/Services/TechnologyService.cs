@@ -39,7 +39,33 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveTechnologiesAsync();
         }
 
-        public async Task<bool> RemoveTechnologyForProject(Guid Id, List<ProjectTechnologyIdDTO> projectTechnologyIdDTO)
+        public async Task<bool> AddTechnologyForDeveloper(Guid id, List<DeveloperTechnologyIdDTO> developerTechnologyIdDTO)
+        {
+            var developer = await _context.Developers
+                                          .Include(dt => dt.DeveloperTechnologies)
+                                          .FirstOrDefaultAsync(i => i.Id == id);
+            
+            if (developer == null)
+            {
+                return false;
+            }
+
+            var technologiesIds = developerTechnologyIdDTO.Select(dto => dto.TechnologyId).ToList();
+
+            var addedTechnologies = await _context.Technologies
+                                                  .Where(t => technologiesIds.Contains(t.Id))
+                                                  .ToListAsync();
+
+            var developerTechnologiesToAdd = addedTechnologies.Select(technology => new DeveloperTechnology
+            {
+                Technology = technology,
+                Developer = developer
+            });
+
+            return await SaveTechnologiesAsync();
+        }
+
+        public async Task<bool> RemoveTechnologyFromProject(Guid Id, List<ProjectTechnologyIdDTO> projectTechnologyIdDTO)
         {
             var project = await _context.Projects
                                         .Include(pt => pt.ProjectTechnologies)
@@ -58,6 +84,29 @@ namespace ProjectCollaborationPlatform.BL.Services
             }
 
             project.ProjectTechnologies.RemoveAll(pt => technologiesToRemove.Contains(pt.TechnologyID));
+
+            return await SaveTechnologiesAsync();
+        }
+
+        public async Task<bool> RemoveTechnologyFromDeveloper(Guid Id, List<DeveloperTechnologyIdDTO> developerTechnologyIdDTO)
+        {
+            var developer = await _context.Developers
+                                          .Include(dt => dt.DeveloperTechnologies)
+                                          .FirstOrDefaultAsync(i => i.Id == Id);
+
+            if(developer == null)
+            {
+                return false;
+            }
+
+            var tecnologiesToRemove = developerTechnologyIdDTO.Select(dto => dto.TechnologyId).ToList();
+
+            if(tecnologiesToRemove == null)
+            {
+                return false;
+            }
+
+            developer.DeveloperTechnologies.RemoveAll(dt => tecnologiesToRemove.Contains(dt.TechnologyID));
 
             return await SaveTechnologiesAsync();
         }
