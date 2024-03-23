@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
+using ProjectCollaborationPlatform.Domain.Pagination;
+using System.Security.Claims;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
@@ -34,28 +37,22 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return StatusCode(StatusCodes.Status200OK, project);
         }
 
-        //[HttpGet("projects")]
-        //public async Task<IActionResult> GetAllProjects(CancellationToken token)
-        //{
-        //    var projects = await _projectService.GetAllProjects(token);
-        //    if (projects != null || projects.Count != 0)
-        //    {
-        //        return StatusCode(StatusCodes.Status200OK, projects);
-        //    }
-        //    else
-        //    {
-        //        throw new CustomApiException()
-        //        {
-        //            StatusCode = StatusCodes.Status404NotFound,
-        //            Title = "Projects not found",
-        //            Detail = "Projects don't exist"
-        //        };
-        //    }
-        //}
-
-        [HttpPost]
-        public async Task<IActionResult> CreateProject([FromBody] ProjectDTO project, CancellationToken token)
+        [HttpGet]
+        public async Task<IActionResult> GetAllProjects([FromQuery] int pageNumber, [FromQuery] int pageSize,
+            [FromQuery] string sortColumn, [FromQuery] string sortDirection, CancellationToken token)
         {
+            var filter = new PaginationFilter(pageNumber, pageSize, sortColumn, sortDirection);
+            var projects = await _projectService.GetAllProjects(filter, token);
+
+            return Ok(projects);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CreateProject([FromBody] ProjectFullInfoDTO project, CancellationToken token)
+        {
+            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             if (project == null)
             {
                 throw new CustomApiException()
@@ -66,7 +63,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 };
             }
 
-            var prj = await _projectService.GetProjectById(project.Id, token);
+            var prj = await _projectService.GetProjectByName(project.Title, token);
 
             if (prj != null)
             {
@@ -77,7 +74,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     Detail = "Project is already exist"
                 };
             }
-            if (await _projectService.AddProject(project))
+            if (await _projectService.AddProject(project, id, token))
             {
                 var createdProject = await _projectService.GetProjectByName(project.Title, token);
                 return Created("api/project", createdProject);
@@ -93,11 +90,12 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, CancellationToken token)
+        [Authorize]
+        [HttpPut("{id:Guid}")]
+        public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, [FromRoute] Guid id, CancellationToken token)
         {
 
-            var projectToUpdate = await _projectService.GetProjectById(projectDTO.Id, token);
+            var projectToUpdate = await _projectService.GetProjectById(id, token);
 
             if (projectToUpdate == null)
             {
@@ -105,13 +103,33 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Title = "Projects not found",
-                    Detail = $"Project with {projectDTO.Id} id not found"
+                    Detail = $"Project with id not found"
                 };
             }
 
-            if (await _projectService.UpdateProject(projectDTO))
+            if (await _projectService.UpdateProject(projectDTO, id))
             {
                 return StatusCode(StatusCodes.Status200OK, "Project updated succesfully");
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while server running"
+                };
+            }
+        }
+
+        [Authorize]
+        [HttpPut("ProjectDetails/{id:Guid}")]
+        public async Task<IActionResult> UpdateProjectDetails([FromBody] ProjectDetailsDTO projectDTO, [FromRoute] Guid id, CancellationToken token)
+        {
+
+            if (await _projectService.UpdateProjectDetails(id, projectDTO.Description))
+            {
+                return StatusCode(StatusCodes.Status200OK, "Project details updated succesfully");
             }
             else
             {

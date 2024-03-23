@@ -10,11 +10,12 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
     {
         Task<ProjectDTO> GetProjectByName(string name, CancellationToken token);
         Task<ProjectDTO> GetProjectById(Guid id, CancellationToken token);
-        Task<bool> AddProject(ProjectDTO projectDTO);
-        Task<bool> UpdateProject(ProjectDTO projectDTO);
+        Task<bool> AddProject(ProjectFullInfoDTO projectDTO, Guid id, CancellationToken token);
+        Task<bool> UpdateProject(ProjectDTO projectDTO, Guid id);
+        Task<bool> UpdateProjectDetails(Guid id, string description);
         Task<bool> DeleteProjectById(Guid id);
         Task<bool> DeleteProjectByName(string name);
         Task<bool> SaveProjectAsync();
-        Task<PagedResponse<List<ProjectDTO>>> GetAllProjects(PaginationFilter filter, CancellationToken token);
+        Task<PagedResponse<List<ProjectFullInfoDTO>>> GetAllProjects(PaginationFilter filter, CancellationToken token);
     }
 }

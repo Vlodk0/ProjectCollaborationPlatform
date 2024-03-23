@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ProjectCollaborationPlatform.Domain.Pagination
+﻿namespace ProjectCollaborationPlatform.Domain.Pagination
 {
     public class Response<T>
     {
