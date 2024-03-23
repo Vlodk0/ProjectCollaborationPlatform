@@ -34,28 +34,22 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return StatusCode(StatusCodes.Status200OK, project);
         }
 
-        //[HttpGet("projects")]
-        //public async Task<IActionResult> GetAllProjects(CancellationToken token)
-        //{
-        //    var projects = await _projectService.GetAllProjects(token);
-        //    if (projects != null || projects.Count != 0)
-        //    {
-        //        return StatusCode(StatusCodes.Status200OK, projects);
-        //    }
-        //    else
-        //    {
-        //        throw new CustomApiException()
-        //        {
-        //            StatusCode = StatusCodes.Status404NotFound,
-        //            Title = "Projects not found",
-        //            Detail = "Projects don't exist"
-        //        };
-        //    }
-        //}
-
-        [HttpPost]
-        public async Task<IActionResult> CreateProject([FromBody] ProjectDTO project, CancellationToken token)
+        [HttpGet]
+        public async Task<IActionResult> GetAllProjects([FromQuery] int pageNumber, [FromQuery] int pageSize,
+            [FromQuery] string sortColumn, [FromQuery] string sortDirection, CancellationToken token)
         {
+            var filter = new PaginationFilter(pageNumber, pageSize, sortColumn, sortDirection);
+            var projects = await _projectService.GetAllProjects(filter, token);
+
+            return Ok(projects);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CreateProject([FromBody] ProjectFullInfoDTO project, CancellationToken token)
+        {
+            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             if (project == null)
             {
                 throw new CustomApiException()

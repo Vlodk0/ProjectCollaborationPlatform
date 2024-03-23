@@ -56,33 +56,32 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveProjectAsync();
         }
 
-        public async Task<PagedResponse<List<ProjectDTO>>> GetAllProjects(PaginationFilter filter, CancellationToken token)
+        public async Task<PagedResponse<List<ProjectFullInfoDTO>>> GetAllProjects(PaginationFilter filter, CancellationToken token)
         {
-            IQueryable<ProjectDTO> projects;
-            projects = _context.Projects
-                .Where(p => p.Payment == filter.Payment)
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize)
-                .Select(p => new ProjectDTO
-                {
-                    Id = p.Id,
-                    Payment = p.Payment,
-                    Title = p.Title
-                });
+            IQueryable<Project> query = _context.Projects;
 
-            if (projects == null)
+            query = filter.SortColumn switch
             {
-                throw new CustomApiException()
+                "Payment" when filter.SortDirection == "asc" =>
+                    query.OrderBy(p => p.Payment),
+                "Payment" => query.OrderByDescending(p => p.Payment),
+                _ => query
+            };
+
+            query = query
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize);
+
+            var result = await query
+                .Include(pd => pd.ProjectDetail)
+                .Select(p => new ProjectFullInfoDTO()
                 {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Title = "Projects not found",
-                    Detail = "Projects don't exist"
-                };
-            }
+                    Payment = p.Payment,
+                    Title = p.Title,
+                    Description = p.ProjectDetail.Description
+                }).ToListAsync(token);
 
-            var result = await projects.ToListAsync(token);
-
-            return new PagedResponse<List<ProjectDTO>>(result, filter.PageNumber, filter.PageSize);
+            return new PagedResponse<List<ProjectFullInfoDTO>>(result, filter.PageNumber, filter.PageSize);
         }
 
         public async Task<ProjectDTO> GetProjectById(Guid id, CancellationToken token)
