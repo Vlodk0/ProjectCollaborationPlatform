@@ -1,13 +1,14 @@
 ﻿
 
+using ProjectCollaborationPlatform.Domain.DTOs;
+
 namespace ProjectCollaborationPlatform.BL.Interfaces
 {
     public interface ITaskService
     {
-        Task<DAL.Data.Models.Task> GetTaskByName(string name, CancellationToken token);
-        Task<DAL.Data.Models.Task> GetTaskById(Guid id, CancellationToken token);
-        Task<bool> CreateTask(DAL.Data.Models.Task task);
-        Task<bool> UpdateTask(DAL.Data.Models.Task task);
+        Task<TaskDTO> GetTaskById(Guid id, CancellationToken token);
+        Task<bool> CreateTask(TaskDTO taskDto);
+        Task<bool> UpdateTask(Guid id, string description);
         Task<bool> DeleteTask(Guid id);
         Task<bool> SaveTaskAsync();
     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
+using ProjectCollaborationPlatform.Domain.DTOs;
 
 namespace ProjectCollaborationPlatform.BL.Services
 {
@@ -13,53 +14,55 @@ namespace ProjectCollaborationPlatform.BL.Services
             _context = context;
         }
 
-        public async Task<bool> CreateTask(DAL.Data.Models.Task task)
+        public async Task<bool> CreateTask(TaskDTO taskDto)
         {
             var tsk = new DAL.Data.Models.Task
             {
-                Descripion = task.Descripion,
+                Description = taskDto.Description,
             };
-            _context.Set<DAL.Data.Models.Task>().Add(tsk);
+            _context.Tasks.Add(tsk);
             return await SaveTaskAsync();
         }
 
         public async Task<bool> DeleteTask(Guid id)
         {
-            var entity = await _context.Set<DAL.Data.Models.Task>().FindAsync(id);
+            var entity = await _context.Tasks.Where(t => t.Id == id).FirstOrDefaultAsync();
             if (entity == null)
             {
                 return false;
             }
 
-            _context.Set<DAL.Data.Models.Task>().Remove(entity);
+            _context.Tasks.Remove(entity);
 
             return await SaveTaskAsync();
         }
 
-        public async Task<DAL.Data.Models.Task> GetTaskById(Guid id, CancellationToken token)
+        public async Task<TaskDTO> GetTaskById(Guid id, CancellationToken token)
         {
-            return await _context.Set<DAL.Data.Models.Task>().FindAsync(id, token);
-        }
+            var task = await _context.Tasks.Where(t => t.Id == id).FirstOrDefaultAsync(token);
 
-        public async Task<DAL.Data.Models.Task> GetTaskByName(string name, CancellationToken token)
-        {
-            return await _context.Set<DAL.Data.Models.Task>().FindAsync(name, token);
+            if(task == null)
+            {
+                return null;
+            }
+
+            return new TaskDTO()
+            {
+                Description = task.Description
+            };
         }
 
         public async Task<bool> SaveTaskAsync()
         {
             var saved = await _context.SaveChangesAsync();
-            return saved > 0 ? true : false;
+            return saved > 0;
         }
 
-        public async Task<bool> UpdateTask(DAL.Data.Models.Task task)
+        public async Task<bool> UpdateTask(Guid id, string description)
         {
-            var tsk = await _context.Tasks.Where(n => n.Descripion == task.Descripion).FirstOrDefaultAsync();
-            tsk = new DAL.Data.Models.Task()
-            {
-               Descripion = task.Descripion,
-            };
-            _context.Tasks.Update(tsk);
+            var task = await _context.Tasks.Where(n => n.Id == id).FirstOrDefaultAsync();
+
+            task.Description = description;
             return await SaveTaskAsync();
         }
     }

@@ -158,7 +158,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 }; ;
             }
 
-            if (await _projectService.DeleteProjectByName(name))
+            if (await _projectService.DeleteProjectByName(name, token))
             {
                 return StatusCode(StatusCodes.Status200OK, "Project deleted succesfully");
             }

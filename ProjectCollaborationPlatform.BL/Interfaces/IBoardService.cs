@@ -9,9 +9,9 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
     {
         Task<BoardDTO> GetBoardByName(string name, CancellationToken token);
         Task<BoardDTO> GetBoardById(Guid id, CancellationToken token);
-        Task<bool> CreateBoard(BoardDTO boardDTO);
-        Task<bool> UpdateBoard(BoardDTO boardDTO);
-        Task<bool> DeleteBoard(Guid id);
+        Task<bool> CreateBoard(Guid id, BoardDTO boardDTO);
+        Task<bool> UpdateBoard(Guid id, string name);
+        Task<bool> DeleteBoard(string name, CancellationToken token);
         Task<bool> SaveBoardAsync();
     }
 }

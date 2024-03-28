@@ -39,8 +39,8 @@ namespace ProjectCollaborationPlatform.BL.Services
                 };
             }
 
-            var title = await _context.Projects.Where(p => p.Title == projectDTO.Title).FirstOrDefaultAsync(token);
-            return await AddProjectDetails(title.Id, projectDTO.Description);
+            var prj = await _context.Projects.Where(p => p.Title == projectDTO.Title).FirstOrDefaultAsync(token);
+            return await AddProjectDetails(prj.Id, projectDTO.Description);
         }
 
         private async Task<bool> AddProjectDetails(Guid id, string description)
@@ -54,28 +54,28 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveProjectAsync();
         }
 
-        public async Task<bool> DeleteProjectById(Guid id)
+        public async Task<bool> DeleteProjectById(Guid id, CancellationToken token)
         {
-            var entity = await _context.Set<Project>().FindAsync(id);
+            var entity = await _context.Projects.Where(p => p.Id == id).FirstOrDefaultAsync(token);
             if (entity == null)
             {
                 return false;
             }
 
-            _context.Set<Project>().Remove(entity);
+            _context.Projects.Remove(entity);
 
             return await SaveProjectAsync();
         }
 
-        public async Task<bool> DeleteProjectByName(string name)
+        public async Task<bool> DeleteProjectByName(string name, CancellationToken token)
         {
-            var entity = await _context.Set<Project>().FindAsync(name);
+            var entity = await _context.Projects.Where(p => p.Title == name).FirstOrDefaultAsync(token);
             if (entity == null)
             {
                 return false;
             }
 
-            _context.Set<Project>().Remove(entity);
+            _context.Projects.Remove(entity);
 
             return await SaveProjectAsync();
         }
@@ -145,7 +145,7 @@ namespace ProjectCollaborationPlatform.BL.Services
             try
             {
                 var saved = await _context.SaveChangesAsync();
-                return saved > 0 ? true : false;
+                return saved > 0;
             }
             catch (Exception ex)
             {

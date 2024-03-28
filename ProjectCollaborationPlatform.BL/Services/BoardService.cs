@@ -1,40 +1,68 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.BL.Services
 {
     public class BoardService : IBoardService
     {
-        readonly ProjectPlatformContext _context;
+        private readonly ProjectPlatformContext _context;
 
         public BoardService(ProjectPlatformContext context)
         {
             _context = context;
         }
 
-        public async Task<bool> CreateBoard(BoardDTO boardDto)
+        public async Task<bool> CreateBoard(Guid id, BoardDTO boardDto)
         {
-            var board = new Board
+            var project = await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+
+            if (project == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project Not Found",
+                    Detail = "Project with the specified id was not found"
+                };
+            }
+
+            var board = new Board()
             {
                 Name = boardDto.Name,
+                ProjectID = project.Id
             };
-            _context.Set<Board>().Add(board);
-            return await SaveBoardAsync();
+
+            _context.Boards.Add(board);
+
+            if (!await SaveBoardAsync())
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occurred while creating project"
+                };
+            }
+            return true;
         }
 
-        public async Task<bool> DeleteBoard(Guid id)
+
+        public async Task<bool> DeleteBoard(string name, CancellationToken token)
         {
 
-            var entity = await _context.Set<Board>().FindAsync(id);
-            if (entity == null)
+            var board = await _context.Boards.Where(i => i.Name == name).FirstOrDefaultAsync(token);
+
+            if (board == null)
             {
                 return false;
             }
 
-            _context.Set<Board>().Remove(entity);
+            _context.Boards.Remove(board);
 
             return await SaveBoardAsync();
         }
@@ -50,7 +78,6 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             return new BoardDTO()
             {
-                Id = board.Id,
                 Name = board.Name,
             };
         }
@@ -66,7 +93,6 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             return new BoardDTO()
             {
-                Id = board.Id,
                 Name = board.Name,
             };
         }
@@ -77,13 +103,11 @@ namespace ProjectCollaborationPlatform.BL.Services
             return saved > 0;
         }
 
-        public async Task<bool> UpdateBoard(BoardDTO boardDTO)
+        public async Task<bool> UpdateBoard(Guid id, string name)
         {
-            var board = await _context.Boards.Where(n => n.Name == boardDTO.Name).FirstOrDefaultAsync();
-            board = new Board()
-            {
-                Name = boardDTO.Name,
-            };
+            var board = await _context.Boards.Where(n => n.ProjectID == id).FirstOrDefaultAsync();
+
+            board.Name = name;
             _context.Boards.Update(board);
             return await SaveBoardAsync();
         }

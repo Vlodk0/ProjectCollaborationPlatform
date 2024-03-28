@@ -1,6 +1,5 @@
 ﻿
 
-using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Pagination;
 
@@ -13,8 +12,8 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
         Task<bool> AddProject(ProjectFullInfoDTO projectDTO, Guid id, CancellationToken token);
         Task<bool> UpdateProject(ProjectDTO projectDTO, Guid id);
         Task<bool> UpdateProjectDetails(Guid id, string description);
-        Task<bool> DeleteProjectById(Guid id);
-        Task<bool> DeleteProjectByName(string name);
+        Task<bool> DeleteProjectById(Guid id, CancellationToken token);
+        Task<bool> DeleteProjectByName(string name, CancellationToken token);
         Task<bool> SaveProjectAsync();
         Task<PagedResponse<List<ProjectFullInfoDTO>>> GetAllProjects(PaginationFilter filter, CancellationToken token);
     }

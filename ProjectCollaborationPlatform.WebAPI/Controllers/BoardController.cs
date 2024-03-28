@@ -18,8 +18,8 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _boardService = boardService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateBoard([FromBody] BoardDTO board, CancellationToken token)
+        [HttpPost("{id:Guid}")]
+        public async Task<IActionResult> CreateBoard([FromBody] BoardDTO board, [FromRoute] Guid id, CancellationToken token)
         {
             if (board == null)
             {
@@ -31,7 +31,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 };
             }
 
-            var brd = await _boardService.GetBoardById(board.Id, token);
+            var brd = await _boardService.GetBoardByName(board.Name, token);
 
             if (brd != null)
             {
@@ -42,7 +42,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     Detail = "Board is already in use"
                 };
             }
-            if (await _boardService.CreateBoard(board))
+            if (await _boardService.CreateBoard(id, board))
             {
                 var createdProject = await _boardService.GetBoardByName(board.Name, token);
                 return Created("api/board", createdProject);
@@ -77,24 +77,12 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateBoard([FromBody] BoardDTO boardDTO, CancellationToken token)
+        [HttpPut("Board/{id:Guid}")]
+        public async Task<IActionResult> UpdateBoard([FromBody] BoardDTO boardDTO, [FromRoute] Guid id)
         {
-            var boardToUpdate = await _boardService.GetBoardById(boardDTO.Id, token);
-
-            if (boardToUpdate == null)
+            if (await _boardService.UpdateBoard(id, boardDTO.Name))
             {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Title = "Board not found",
-                    Detail = $"Board with {boardDTO.Id} id doesn't exist"
-                };
-            }
-
-            if (await _boardService.UpdateBoard(boardDTO))
-            {
-                return StatusCode(StatusCodes.Status200OK, "Project updated succesfully");
+                return StatusCode(StatusCodes.Status200OK, "Board updated succesfully");
             }
             else
             {
@@ -122,7 +110,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 };
             }
 
-            if (await _boardService.DeleteBoard(boardToDelete.Id))
+            if (await _boardService.DeleteBoard(boardToDelete.Name, token))
             {
                 return StatusCode(StatusCodes.Status200OK, "Board deleted succesfully");
             }
