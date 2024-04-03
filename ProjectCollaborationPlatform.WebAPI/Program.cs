@@ -39,6 +39,17 @@ namespace ProjectCollaborationPlatform.WebAPI
                 option.UseSqlServer(builder.Configuration.GetConnectionString("db"));
             });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowMyOrigins", policy =>
+                {
+                    policy
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -79,6 +90,8 @@ namespace ProjectCollaborationPlatform.WebAPI
             {
                 app.UseExceptionHandler("/Error");
             }
+
+            app.UseCors("AllowMyOrigins");
 
             app.UseHttpsRedirection();
 
