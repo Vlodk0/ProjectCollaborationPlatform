@@ -75,9 +75,9 @@ namespace ProjectCollaborationPlatform.BL.Services
             return saved > 0;
         }
 
-        public async Task<bool> UpdateFunctionalityBlock(string name)
+        public async Task<bool> UpdateFunctionalityBlock(Guid id, string name)
         {
-            var funckBlock = await _context.FunctionalityBlocks.Where(n => n.Name == name).FirstOrDefaultAsync();
+            var funckBlock = await _context.FunctionalityBlocks.Where(n => n.Id == id).FirstOrDefaultAsync();
 
             funckBlock.Name = name;
             _context.FunctionalityBlocks.Update(funckBlock);

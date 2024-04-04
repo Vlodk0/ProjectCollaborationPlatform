@@ -29,6 +29,7 @@ namespace ProjectCollaborationPlatform.WebAPI
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<IBoardService, BoardService>();
             builder.Services.AddScoped<ITeamService, TeamService>();
+            builder.Services.AddScoped<IFunctionalityBlockService, FunctionalityBlockService>();
             builder.Services.AddTransient<IPhotoManageService, PhotoManageService>();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
