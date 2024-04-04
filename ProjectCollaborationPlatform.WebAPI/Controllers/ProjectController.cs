@@ -34,7 +34,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     Detail = "Project with such name doesn't exist"
                 };
             }
-            return StatusCode(StatusCodes.Status200OK, project);
+            return Ok(project);
         }
 
         [HttpGet]
@@ -103,13 +103,13 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Title = "Projects not found",
-                    Detail = $"Project with id not found"
+                    Detail = "Project with such id not found"
                 };
             }
 
             if (await _projectService.UpdateProject(projectDTO, id))
             {
-                return StatusCode(StatusCodes.Status200OK, "Project updated succesfully");
+                return Ok("Project updated succesfully");
             }
             else
             {
@@ -154,13 +154,13 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Title = "Projects not found",
-                    Detail = $"Project with such name: {name}, not found"
-                }; ;
+                    Detail = "Project with such name not found"
+                };
             }
 
             if (await _projectService.DeleteProjectByName(name, token))
             {
-                return StatusCode(StatusCodes.Status200OK, "Project deleted succesfully");
+                return Ok("Project deleted successfully");
             }
             else
             {

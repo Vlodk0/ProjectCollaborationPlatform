@@ -40,7 +40,10 @@ namespace ProjectCollaborationPlatform.BL.Services
             }
 
             var prj = await _context.Projects.Where(p => p.Title == projectDTO.Title).FirstOrDefaultAsync(token);
-            return await AddProjectDetails(prj.Id, projectDTO.Description);
+
+            await AddProjectDetails(prj.Id, projectDTO.Description);
+
+            return await AddBoardOnTheProject(prj.Id, projectDTO.BoardName);
         }
 
         private async Task<bool> AddProjectDetails(Guid id, string description)
@@ -51,6 +54,17 @@ namespace ProjectCollaborationPlatform.BL.Services
                 Description = description,
             };
             _context.ProjectDetails.Add(projectDetails);
+            return await SaveProjectAsync();
+        }
+
+        private async Task<bool> AddBoardOnTheProject(Guid id, string name)
+        {
+            var board = new Board()
+            {
+                Name = name,
+                ProjectID = id,
+            };
+            _context.Boards.Add(board);
             return await SaveProjectAsync();
         }
 
@@ -93,8 +107,11 @@ namespace ProjectCollaborationPlatform.BL.Services
             };
 
             query = query
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Skip(filter.PageNumber)
                 .Take(filter.PageSize);
+
+            var totalRecords = await _context.Projects.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
 
             var result = await query
                 .Include(pd => pd.ProjectDetail)
@@ -105,7 +122,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                     Description = p.ProjectDetail.Description
                 }).ToListAsync(token);
 
-            return new PagedResponse<List<ProjectFullInfoDTO>>(result, filter.PageNumber, filter.PageSize);
+            return new PagedResponse<List<ProjectFullInfoDTO>>(result, filter.PageNumber, filter.PageSize, totalRecords, totalPages);
         }
 
         public async Task<ProjectDTO> GetProjectById(Guid id, CancellationToken token)
