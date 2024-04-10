@@ -57,7 +57,7 @@ namespace ProjectCollaborationPlatform.BL.Services
             return new ProjectOwnerDTO()
             {
                 Id = projectOwner.Id,
-                Email = projectOwner.Email,
+                Email = email,
                 FirstName = projectOwner.FirstName,
                 LastName = projectOwner.LastName,
             };
@@ -74,7 +74,7 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             return new ProjectOwnerDTO()
             {
-                Id = projectOwner.Id,
+                Id = id,
                 Email = projectOwner.Email,
                 FirstName = projectOwner.FirstName,
                 LastName = projectOwner.LastName,

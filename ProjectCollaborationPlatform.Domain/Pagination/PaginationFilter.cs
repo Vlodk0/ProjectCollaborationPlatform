@@ -10,7 +10,7 @@
 
         public PaginationFilter()
         {
-            PageNumber = 1;
+            PageNumber = 0;
             PageSize = 10;
             Payment = 0;
             SortDirection = "asc";
@@ -23,6 +23,12 @@
             PageSize = pageSize > 10 ? 10 : pageSize;
             SortColumn = sortColumn;
             SortDirection = sortDirection;
+        }
+
+        public PaginationFilter(int pageNumber, int pageSize)
+        {
+            PageNumber = pageNumber < 1 ? 0 : pageNumber;
+            PageSize = pageSize > 10 ? 10 : pageSize;
         }
     }
 }
