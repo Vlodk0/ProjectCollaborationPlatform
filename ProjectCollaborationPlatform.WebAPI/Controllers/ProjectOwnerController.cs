@@ -25,14 +25,14 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreateProjectOwner(CreateProjectOwnerDTO projectOwnerDTO, CancellationToken token)
-        {
+            {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
             Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            string email =HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            string email = HttpContext.User.FindFirstValue(ClaimTypes.Email);
 
             var usr = await _projectOwnerService.GetProjectOwnerById(id, token);
 
@@ -58,7 +58,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             if (createUser)
             {
-                return Ok(createUser);
+                return Ok();
             }
             else
             {
@@ -72,7 +72,34 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet()]
+        [HttpGet("{email}")]
+        public async Task<IActionResult> GetProjectOwnerByEmail([FromRoute] string email, CancellationToken token)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var usr = await _projectOwnerService.GetProjectOwnerByEmail(email, token);
+
+            if (usr != null )
+            {
+                return Ok();
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Not found",
+                    Detail = "User not found"
+                };
+            }
+
+        }
+
+        [Authorize]
+        [HttpGet]
         public async Task<IActionResult> GetProjectOwnerById(CancellationToken token)
         {
             Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -128,7 +155,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateProjectOwner([FromBody] ProjectOwnerDTO projectOwnerDTO, CancellationToken token)
         {
-            var projectOwnerToUpdate = await _projectOwnerService.GetProjectOwnerById(projectOwnerDTO.Id, token);
+            var projectOwnerToUpdate = await _projectOwnerService.GetProjectOwnerByEmail(projectOwnerDTO.Email, token);
 
             if (projectOwnerToUpdate == null)
             {
@@ -136,7 +163,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Title = "User not found",
-                    Detail = $"User with {projectOwnerDTO.Id} id not found"
+                    Detail = "User with such id not found"
                 };
             }
 

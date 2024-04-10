@@ -3,6 +3,7 @@ using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Pagination;
 
 namespace ProjectCollaborationPlatform.BL.Services
 {
@@ -80,6 +81,34 @@ namespace ProjectCollaborationPlatform.BL.Services
                 LastName = dev.LastName,
             };
 
+        }
+
+        public async Task<PagedResponse<List<PaginationDeveloperDTO>>> GetAllDevelopers(PaginationFilter filter, CancellationToken token)
+        {
+            IQueryable<Developer> query = _context.Developers;
+
+            var totalRecords = await query.CountAsync(token);
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
+
+            query = query
+                .Skip(filter.PageNumber)
+                .Take(filter.PageSize);
+
+            var result = await query
+                .Include(td => td.DeveloperTechnologies)
+                .ThenInclude(t => t.Technology)
+                .Select(d => new PaginationDeveloperDTO()
+                {
+                    FirstName = d.FirstName,
+                    LastName = d.LastName,
+                    Technologies = d.DeveloperTechnologies.Select(i => new DeveloperTechnologyDTO()
+                    {
+                        Technology = i.Technology.Language,
+                        Framework = i.Technology.Framework
+                    }).ToList()
+                }).ToListAsync(token);
+
+            return new PagedResponse<List<PaginationDeveloperDTO>>(result, filter.PageNumber, filter.PageSize, totalRecords, totalPages);
         }
 
         public Task<bool> IsDeveloperExists(string email)

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
+using ProjectCollaborationPlatform.BL.Services;
 using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
+using ProjectCollaborationPlatform.Domain.Pagination;
 using System.Security.Claims;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
@@ -58,7 +60,10 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             if (createUser)
             {
-                return Ok(createUser);
+                return Ok(new
+                {
+                    message = "User created"
+                });
             }
             else
             {
@@ -69,6 +74,61 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     Detail = "Error occured while server running"
                 };
             }
+        }
+
+        [Authorize]
+        [HttpGet("{email}")]
+        public async Task<IActionResult> GetDeveloperByEmail([FromRoute] string email, CancellationToken token)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var usr = await _developerService.GetDeveloperByEmail(email, token);
+
+            if (usr != null)
+            {
+                return Ok(new
+                {
+                    message = "User found"
+                });
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Not found",
+                    Detail = "User not found"
+                };
+            }
+
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetDeveloperById(CancellationToken token)
+        {
+            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var projectOwner = await _developerService.GetDeveloperById(id, token);
+
+            if (projectOwner == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "User not found",
+                    Detail = $"User with such id not found"
+                };
+            }
+
+            return Ok(new
+            {
+                message = "User exists"
+            });
+
         }
 
         [Authorize]
@@ -95,7 +155,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet("file")]
         public async Task<IActionResult> FileDownload([FromQuery] string fileName)
         {
             var result = await _photoService.DownloadFile(fileName);
@@ -113,7 +173,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Title = "User not found",
-                    Detail = $"User with {developerDTO.Id} id not found"
+                    Detail = "User with such id not found"
                 };
             }
 
@@ -143,7 +203,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Title = "User not found",
-                    Detail = $"User with {id} id not found"
+                    Detail = "User with such id not found"
                 };
             }
 
@@ -161,6 +221,15 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     Detail = "Error occured while server running"
                 };
             }
+        }
+
+        [HttpGet("developers")]
+        public async Task<IActionResult> GetAllDevelopers([FromQuery] PaginationFilter paginationFilter, CancellationToken token)
+        {
+            var filter = new PaginationFilter(paginationFilter.PageNumber, paginationFilter.PageSize);
+            var developers = await _developerService.GetAllDevelopers(filter, token);
+
+            return Ok(developers);
         }
     }
 }

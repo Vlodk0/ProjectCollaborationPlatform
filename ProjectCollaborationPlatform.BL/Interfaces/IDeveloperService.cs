@@ -2,6 +2,7 @@
 
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Pagination;
 
 namespace ProjectCollaborationPlatform.BL.Interfaces
 {
@@ -14,6 +15,6 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
         Task<bool> DeleteDeveloper(Guid id);
         Task<bool> SaveDeveloperAsync();
         Task<bool> IsDeveloperExists(string email);
-
+        Task<PagedResponse<List<PaginationDeveloperDTO>>> GetAllDevelopers(PaginationFilter filter, CancellationToken token);
     }
 }
