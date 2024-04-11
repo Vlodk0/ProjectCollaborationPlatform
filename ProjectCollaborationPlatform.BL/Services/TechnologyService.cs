@@ -16,27 +16,38 @@ namespace ProjectCollaborationPlatform.BL.Services
         {
             _context = context;
         }
-        public async Task<bool> AddTechnologyForProject(Guid Id, List<ProjectTechnologyIdDTO> projectTechnologyIdDTO)
+        public async Task<bool> AddTechnologyForProject(Guid id, List<string> techId)
         {
-            var project = await _context.Projects
-                                        .Include(pt => pt.ProjectTechnologies)
-                                        .FirstOrDefaultAsync(i => i.Id == Id);
-            if (project == null)
+            var project = await _context.Projects.AnyAsync(i => i.Id == id);
+            if (!project)
             {
-                return false;
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project not found",
+                    Detail = "Project with such id not found"
+                };
             }
 
-            var technologiesIds = projectTechnologyIdDTO.Select(dto => dto.TechnologyId).ToList();
+            var isTechExist = techId.All(techId => _context.Technologies.Any(x => x.Id == Guid.Parse(techId)));
 
-            var addedTechnologies = await _context.Technologies
-                                                  .Where(t => technologiesIds.Contains(t.Id))
-                                                  .ToListAsync();
-
-            var projectTechnologiesToAdd = addedTechnologies.Select(technology => new ProjectTechnology
+            if (!isTechExist)
             {
-                Technology = technology,
-                Project = project
-            });
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Technologies not found",
+                    Detail = "Technologies with such ids not found"
+                };
+            }
+
+            var projTechnologies = techId.Select(pt => new ProjectTechnology
+            {
+                ProjectID = id,
+                TechnologyID = Guid.Parse(pt)
+            }).ToList();
+
+            _context.ProjectTechnologies.AddRange(projTechnologies);
 
             return await SaveTechnologiesAsync();
         }
@@ -80,25 +91,40 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         }
 
-        public async Task<bool> RemoveTechnologyFromProject(Guid Id, List<ProjectTechnologyIdDTO> projectTechnologyIdDTO)
+        public async Task<bool> RemoveTechnologyFromProject(Guid id, List<string> techId)
         {
             var project = await _context.Projects
-                                        .Include(pt => pt.ProjectTechnologies)
-                                        .FirstOrDefaultAsync(i => i.Id == Id);
+                                          .AnyAsync(i => i.Id == id);
 
-            if (project == null)
+            if (!project)
             {
-                return false;
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project not found",
+                    Detail = "Project with such id not found"
+                };
+            }
+            var isTechExist = techId.All(techId =>
+                _context.Technologies.Any(x => x.Id == Guid.Parse(techId)));
+
+            if (!isTechExist)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Technologies not found",
+                    Detail = "Technologies with such ids not found"
+                };
             }
 
-            var technologiesToRemove = projectTechnologyIdDTO.Select(dto => dto.TechnologyId).ToList();
-
-            if (technologiesToRemove == null)
+            var projectTechnologiesToRemove = techId.Select(techId => new ProjectTechnology
             {
-                return false;
-            }
+                ProjectID = id,
+                TechnologyID = Guid.Parse(techId)
+            }).ToList();
 
-            project.ProjectTechnologies.RemoveAll(pt => technologiesToRemove.Contains(pt.TechnologyID));
+            _context.ProjectTechnologies.RemoveRange(projectTechnologiesToRemove);
 
             return await SaveTechnologiesAsync();
         }

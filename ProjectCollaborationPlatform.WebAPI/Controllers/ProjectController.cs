@@ -15,12 +15,15 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectService _projectService;
+        private readonly ITechnologyService _technologyService;
 
-        public ProjectController(IProjectService projectService)
+        public ProjectController(IProjectService projectService, ITechnologyService technologyService)
         {
             _projectService = projectService;
+            _technologyService = technologyService;
         }
 
+        [Authorize]
         [HttpGet("{name}")]
         public async Task<IActionResult> GetProjectByName([FromRoute] string name, CancellationToken token)
         {
@@ -142,7 +145,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-
+        [Authorize]
         [HttpDelete("{name}")]
         public async Task<ActionResult<Project>> DeleteProjectByName([FromRoute] string name, CancellationToken token)
         {
@@ -169,6 +172,58 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     StatusCode = StatusCodes.Status500InternalServerError,
                     Title = "Server Error",
                     Detail = "Error occured while server running"
+                };
+            }
+        }
+
+        [Authorize]
+        [HttpPost("technologies/{id:Guid}")]
+        public async Task<IActionResult> AddTechnologyToProject([FromRoute] Guid id, List<string> techId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var result = await _technologyService.AddTechnologyForProject(id, techId);
+
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while adding technologies for project"
+                };
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("technologies/{id:Guid}")]
+        public async Task<IActionResult> RemoveTechnologiesFromProject([FromRoute] Guid id, List<string> techId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var result = await _technologyService.RemoveTechnologyFromProject(id, techId);
+
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while removing technologies for project"
                 };
             }
         }
