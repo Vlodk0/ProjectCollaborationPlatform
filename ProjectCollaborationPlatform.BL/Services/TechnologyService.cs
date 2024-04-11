@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.BL.Services
 {
@@ -44,7 +46,12 @@ namespace ProjectCollaborationPlatform.BL.Services
             bool dev = await _context.Developers.AnyAsync(i => i.Id == id);
             if (!dev)
             {
-                return false;
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Dev not found",
+                    Detail = "Dev with such id not found"
+                };
             }
 
             bool allTechIdsExist = techId.All(techId =>
@@ -52,7 +59,12 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             if (!allTechIdsExist)
             {
-                return false; 
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Technologies not found",
+                    Detail = "Technologies with such ids not found"
+                };
             }
 
             var developerTechnologies = techId.Select(techId => new DeveloperTechnology
