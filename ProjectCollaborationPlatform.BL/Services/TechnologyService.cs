@@ -39,30 +39,33 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveTechnologiesAsync();
         }
 
-        public async Task<bool> AddTechnologyForDeveloper(Guid id, List<DeveloperTechnologyIdDTO> developerTechnologyIdDTO)
+        public async Task<bool> AddTechnologyForDeveloper(Guid id, List<string> techId)
         {
-            var developer = await _context.Developers
-                                          .Include(dt => dt.DeveloperTechnologies)
-                                          .FirstOrDefaultAsync(i => i.Id == id);
-            
-            if (developer == null)
+            bool dev = await _context.Developers.AnyAsync(i => i.Id == id);
+            if (!dev)
             {
                 return false;
             }
 
-            var technologiesIds = developerTechnologyIdDTO.Select(dto => dto.TechnologyId).ToList();
+            bool allTechIdsExist = techId.All(techId =>
+                _context.Technologies.Any(x => x.Id == Guid.Parse(techId)));
 
-            var addedTechnologies = await _context.Technologies
-                                                  .Where(t => technologiesIds.Contains(t.Id))
-                                                  .ToListAsync();
-
-            var developerTechnologiesToAdd = addedTechnologies.Select(technology => new DeveloperTechnology
+            if (!allTechIdsExist)
             {
-                Technology = technology,
-                Developer = developer
-            });
+                return false; 
+            }
+
+            var developerTechnologies = techId.Select(techId => new DeveloperTechnology
+            {
+                DeveloperID = id,
+                TechnologyID = Guid.Parse(techId)
+            }).ToList();
+
+            _context.DeveloperTechnologies.AddRange(developerTechnologies);
 
             return await SaveTechnologiesAsync();
+
+
         }
 
         public async Task<bool> RemoveTechnologyFromProject(Guid Id, List<ProjectTechnologyIdDTO> projectTechnologyIdDTO)
@@ -78,7 +81,7 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             var technologiesToRemove = projectTechnologyIdDTO.Select(dto => dto.TechnologyId).ToList();
 
-            if ( technologiesToRemove == null)
+            if (technologiesToRemove == null)
             {
                 return false;
             }
@@ -94,14 +97,14 @@ namespace ProjectCollaborationPlatform.BL.Services
                                           .Include(dt => dt.DeveloperTechnologies)
                                           .FirstOrDefaultAsync(i => i.Id == Id);
 
-            if(developer == null)
+            if (developer == null)
             {
                 return false;
             }
 
             var tecnologiesToRemove = developerTechnologyIdDTO.Select(dto => dto.TechnologyId).ToList();
 
-            if(tecnologiesToRemove == null)
+            if (tecnologiesToRemove == null)
             {
                 return false;
             }
