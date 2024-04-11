@@ -103,25 +103,40 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveTechnologiesAsync();
         }
 
-        public async Task<bool> RemoveTechnologyFromDeveloper(Guid Id, List<DeveloperTechnologyIdDTO> developerTechnologyIdDTO)
+        public async Task<bool> RemoveTechnologyFromDeveloper(Guid id, List<string> techId)
         {
             var developer = await _context.Developers
-                                          .Include(dt => dt.DeveloperTechnologies)
-                                          .FirstOrDefaultAsync(i => i.Id == Id);
+                                          .AnyAsync(i => i.Id == id);
 
-            if (developer == null)
+            if (!developer)
             {
-                return false;
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Dev not found",
+                    Detail = "Dev with such id not found"
+                };
+            }
+            bool allTechIdsExist = techId.All(techId =>
+                _context.Technologies.Any(x => x.Id == Guid.Parse(techId)));
+
+            if (!allTechIdsExist)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Technologies not found",
+                    Detail = "Technologies with such ids not found"
+                };
             }
 
-            var tecnologiesToRemove = developerTechnologyIdDTO.Select(dto => dto.TechnologyId).ToList();
-
-            if (tecnologiesToRemove == null)
+            var developerTechnologiesToRemove = techId.Select(techId => new DeveloperTechnology
             {
-                return false;
-            }
+                DeveloperID = id,
+                TechnologyID = Guid.Parse(techId)
+            }).ToList();
 
-            developer.DeveloperTechnologies.RemoveAll(dt => tecnologiesToRemove.Contains(dt.TechnologyID));
+            _context.DeveloperTechnologies.RemoveRange(developerTechnologiesToRemove);
 
             return await SaveTechnologiesAsync();
         }
