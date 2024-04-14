@@ -40,6 +40,23 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return Ok(project);
         }
 
+        [Authorize]
+        [HttpGet("{id:Guid}")]
+        public async Task<IActionResult> GetProjectById([FromRoute] Guid id, CancellationToken token)
+        {
+            var project = await _projectService.GetProjectById(id, token);
+            if (project == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project not found",
+                    Detail = "Project with such id doesn't exist"
+                };
+            }
+            return Ok(project);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetAllProjects([FromQuery] int pageNumber, [FromQuery] int pageSize,
             [FromQuery] string sortColumn, [FromQuery] string sortDirection, CancellationToken token)

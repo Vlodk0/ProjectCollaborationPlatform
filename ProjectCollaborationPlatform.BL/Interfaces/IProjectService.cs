@@ -8,7 +8,7 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
     public  interface IProjectService
     {
         Task<ProjectDTO> GetProjectByName(string name, CancellationToken token);
-        Task<ProjectDTO> GetProjectById(Guid id, CancellationToken token);
+        Task<GetProjectDTO> GetProjectById(Guid id, CancellationToken token);
         Task<bool> AddProject(ProjectFullInfoDTO projectDTO, Guid id, CancellationToken token);
         Task<bool> UpdateProject(ProjectDTO projectDTO, Guid id);
         Task<bool> UpdateProjectDetails(Guid id, string description);

@@ -6,6 +6,7 @@ using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
 using ProjectCollaborationPlatform.Domain.Pagination;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace ProjectCollaborationPlatform.BL.Services
@@ -115,30 +116,43 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             var result = await query
                 .Include(pd => pd.ProjectDetail)
+                .Include(pt => pt.ProjectTechnologies)
                 .Select(p => new ProjectFullInfoDTO()
                 {
+                    Id = p.Id,
                     Payment = p.Payment,
                     Title = p.Title,
-                    Description = p.ProjectDetail.Description
+                    Description = p.ProjectDetail.Description,
+                    Technologies = p.ProjectTechnologies.Select(i => new DeveloperTechnologyDTO
+                    {
+                        Technology = i.Technology.Language,
+                        Framework = i.Technology.Framework
+                    }).ToList(),
                 }).ToListAsync(token);
 
             return new PagedResponse<List<ProjectFullInfoDTO>>(result, filter.PageNumber, filter.PageSize, totalRecords, totalPages);
         }
 
-        public async Task<ProjectDTO> GetProjectById(Guid id, CancellationToken token)
+        public async Task<GetProjectDTO> GetProjectById(Guid id, CancellationToken token)
         {
-            var project = await _context.Projects.Where(i => i.Id == id).FirstOrDefaultAsync(token);
+       
+            return await _context.Projects
+                .Include(pd => pd.ProjectDetail)
+                .Include(pt => pt.ProjectTechnologies)
+                .Where(i => i.Id == id)
+                .Select(t => new GetProjectDTO()
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Payment = t.Payment,
+                    Description = t.ProjectDetail.Description,
+                    Technologies = t.ProjectTechnologies.Select(i => new DeveloperTechnologyDTO
+                    {
+                        Technology = i.Technology.Language,
+                        Framework = i.Technology.Framework
+                    }).ToList()
+                }).FirstAsync(token);
 
-            if (project == null)
-            {
-                return null;
-            }
-
-            return new ProjectDTO()
-            {
-                Title = project.Title,
-                Payment = project.Payment,
-            };
         }
 
         public async Task<ProjectDTO> GetProjectByName(string name, CancellationToken token)
