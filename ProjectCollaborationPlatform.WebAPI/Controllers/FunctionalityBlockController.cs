@@ -17,24 +17,6 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _functionalityBlockService = functionalityBlockService;
         }
 
-        [HttpGet("{name}")]
-        public async Task<IActionResult> GetFunctionalityBlockByName([FromRoute] string name, CancellationToken token)
-        {
-            var funcBlock = await _functionalityBlockService.GetFunctionalityBlockByName(name, token);
-
-            if (funcBlock == null)
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Title = "FunctionalityBlock not found",
-                    Detail = "FunctionalityBlock with such name doesn't exist"
-                };
-            }
-
-            return Ok(funcBlock);
-        }
-
         [HttpPost]
         public async Task<IActionResult> CreateFunctionalityBlock([FromBody] FunctionalityBlockDTO functionalityBlockDTO,
             Guid boardId, CancellationToken token)
@@ -49,7 +31,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 };
             }
 
-            var funcBlock = await _functionalityBlockService.GetFunctionalityBlockByName(functionalityBlockDTO.Name,
+            var funcBlock = await _functionalityBlockService.GetFunctionalityBlockById(functionalityBlockDTO.Id,
                 token);
 
             if (funcBlock != null)
@@ -65,7 +47,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             if (await _functionalityBlockService.CreateFunctionalityBlock(functionalityBlockDTO, boardId))
             {
                 var createdFuncBlock = await _functionalityBlockService
-                    .GetFunctionalityBlockByName(functionalityBlockDTO.Name, token);
+                    .GetFunctionalityBlockById(functionalityBlockDTO.Id, token);
 
                 return Created("api/functionalityBlock", createdFuncBlock);
             }
@@ -96,7 +78,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 };
             }
 
-            if (await _functionalityBlockService.UpdateFunctionalityBlock(id, functionalityBlockDTO.Name))
+            if (await _functionalityBlockService.UpdateFunctionalityBlock(id, functionalityBlockDTO.Task))
             {
                 return Ok("FunctionalityBlock updated successfully");
             }

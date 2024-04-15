@@ -16,7 +16,6 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
         public DbSet<ProjectDetail> ProjectDetails { get; set; }
         public DbSet<ProjectDeveloper> ProjectDevelopers { get; set; }
         public DbSet<ProjectTechnology> ProjectTechnologies { get; set; }
-        public DbSet<Models.Task> Tasks { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamDeveloper> TeamDevelopers { get; set; }
         public DbSet<Technology> Technologies { get; set; }

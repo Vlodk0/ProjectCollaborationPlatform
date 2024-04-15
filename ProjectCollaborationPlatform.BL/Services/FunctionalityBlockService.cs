@@ -19,7 +19,8 @@ namespace ProjectCollaborationPlatform.BL.Services
         {
             var funcBlock = new FunctionalityBlock
             {
-                Name = functionalityBlock.Name,
+                Id = functionalityBlock.Id,
+                Task = functionalityBlock.Task,
                 BoardID = boardId
             };
             _context.FunctionalityBlocks.Add(funcBlock);
@@ -50,22 +51,8 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             return new FunctionalityBlockDTO()
             {
-                Name = funcBlock.Name
-            };
-        }
-
-        public async Task<FunctionalityBlockDTO> GetFunctionalityBlockByName(string name, CancellationToken token)
-        {
-            var funcBlock = await _context.FunctionalityBlocks.Where(i => i.Name == name).FirstOrDefaultAsync(token);
-
-            if (funcBlock == null)
-            {
-                return null;
-            }
-
-            return new FunctionalityBlockDTO()
-            {
-                Name = funcBlock.Name
+                Id = funcBlock.Id,
+                Task = funcBlock.Task
             };
         }
 
@@ -75,11 +62,11 @@ namespace ProjectCollaborationPlatform.BL.Services
             return saved > 0;
         }
 
-        public async Task<bool> UpdateFunctionalityBlock(Guid id, string name)
+        public async Task<bool> UpdateFunctionalityBlock(Guid id, string task)
         {
             var funckBlock = await _context.FunctionalityBlocks.Where(n => n.Id == id).FirstOrDefaultAsync();
 
-            funckBlock.Name = name;
+            funckBlock.Task = task;
             _context.FunctionalityBlocks.Update(funckBlock);
             return await SaveFunctionalityBlockAsync();
         }

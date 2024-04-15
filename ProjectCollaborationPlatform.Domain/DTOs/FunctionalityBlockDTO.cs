@@ -2,6 +2,7 @@
 {
     public class FunctionalityBlockDTO
     {
-        public string Name {  get; set; }
+        public Guid Id { get; set; }
+        public string Task {  get; set; }
     }
 }
