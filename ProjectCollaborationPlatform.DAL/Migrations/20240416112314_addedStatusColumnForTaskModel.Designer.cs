@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 
@@ -11,9 +12,10 @@ using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 namespace ProjectCollaborationPlatform.Data.Migrations
 {
     [DbContext(typeof(ProjectPlatformContext))]
-    partial class ProjectPlatformContextModelSnapshot : ModelSnapshot
+    [Migration("20240416112314_addedStatusColumnForTaskModel")]
+    partial class addedStatusColumnForTaskModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +42,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.HasIndex("ProjectID")
                         .IsUnique();
 
-                    b.ToTable("Boards", (string)null);
+                    b.ToTable("Boards");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Developer", b =>
@@ -66,7 +68,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Developers", (string)null);
+                    b.ToTable("Developers");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.DeveloperTechnology", b =>
@@ -81,7 +83,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasIndex("TechnologyID");
 
-                    b.ToTable("DeveloperTechnologies", (string)null);
+                    b.ToTable("DeveloperTechnologies");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.FunctionalityBlock", b =>
@@ -104,7 +106,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasIndex("BoardID");
 
-                    b.ToTable("FunctionalityBlocks", (string)null);
+                    b.ToTable("FunctionalityBlocks");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Project", b =>
@@ -127,7 +129,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasIndex("ProjectOwnerID");
 
-                    b.ToTable("Projects", (string)null);
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectDetail", b =>
@@ -148,7 +150,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.HasIndex("ProjectID")
                         .IsUnique();
 
-                    b.ToTable("ProjectDetails", (string)null);
+                    b.ToTable("ProjectDetails");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectDeveloper", b =>
@@ -163,7 +165,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasIndex("DeveloperID");
 
-                    b.ToTable("ProjectDevelopers", (string)null);
+                    b.ToTable("ProjectDevelopers");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectOwner", b =>
@@ -189,7 +191,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProjectOwners", (string)null);
+                    b.ToTable("ProjectOwners");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectTechnology", b =>
@@ -204,7 +206,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasIndex("TechnologyID");
 
-                    b.ToTable("ProjectTechnologies", (string)null);
+                    b.ToTable("ProjectTechnologies");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Team", b =>
@@ -218,7 +220,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Teams", (string)null);
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.TeamDeveloper", b =>
@@ -233,7 +235,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasIndex("TeamID");
 
-                    b.ToTable("TeamDevelopers", (string)null);
+                    b.ToTable("TeamDevelopers");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Technology", b =>
@@ -252,7 +254,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Technologies", (string)null);
+                    b.ToTable("Technologies");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Models.PhotoFile", b =>
@@ -285,7 +287,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.HasIndex("ProjectOwnerId")
                         .IsUnique();
 
-                    b.ToTable("PhotoFiles", (string)null);
+                    b.ToTable("PhotoFiles");
                 });
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Board", b =>
