@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
+using ProjectCollaborationPlatform.BL.Services;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Enums;
 using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
@@ -17,9 +19,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _functionalityBlockService = functionalityBlockService;
         }
 
-        [HttpPost]
+        [HttpPost("{boardId:Guid}")]
         public async Task<IActionResult> CreateFunctionalityBlock([FromBody] FunctionalityBlockDTO functionalityBlockDTO,
-            Guid boardId, CancellationToken token)
+            [FromRoute] Guid boardId, CancellationToken token)
         {
             if (functionalityBlockDTO == null)
             {
@@ -111,6 +113,53 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             if(await _functionalityBlockService.DeleteFunctionalityBlock(id))
             {
                 return Ok("FunctionalityBlock deleted successfully");
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while server running"
+                };
+            }
+        }
+
+        [HttpGet("{id:Guid}")]
+        public async Task<IActionResult> GetFunctionalityBlockById([FromRoute] Guid id, CancellationToken token)
+        {
+            var funcBlock = await _functionalityBlockService.GetFunctionalityBlocksByBoardId(id, token);
+            if (funcBlock == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project not found",
+                    Detail = "Project with such id doesn't exist"
+                };
+            }
+            return Ok(funcBlock);
+        }
+
+        [HttpPatch("{id:Guid}")]
+        public async Task<IActionResult> UpdateFunctionalityBlockByStatus([FromRoute] Guid id, [FromBody] StatusEnum status, 
+            CancellationToken token)
+        {
+            var funcBlock = await _functionalityBlockService.GetFunctionalityBlockById(id, token);
+
+            if (funcBlock == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project not found",
+                    Detail = "Project with such id doesn't exist"
+                };
+            }
+
+            if (await _functionalityBlockService.UpdateFunctionalityBlockStatus(id, status))
+            {
+                return Ok("Status updated successfully");
             }
             else
             {

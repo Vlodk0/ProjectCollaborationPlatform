@@ -1,8 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Enums;
+using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.BL.Services
 {
@@ -21,22 +24,10 @@ namespace ProjectCollaborationPlatform.BL.Services
             {
                 Id = functionalityBlock.Id,
                 Task = functionalityBlock.Task,
+                Status = functionalityBlock.Status,
                 BoardID = boardId
             };
             _context.FunctionalityBlocks.Add(funcBlock);
-            return await SaveFunctionalityBlockAsync();
-        }
-
-        public async Task<bool> DeleteFunctionalityBlock(Guid id)
-        {
-            var entity = await _context.FunctionalityBlocks.Where(fb => fb.Id == id).FirstOrDefaultAsync();
-            if (entity == null)
-            {
-                return false;
-            }
-
-            _context.FunctionalityBlocks.Remove(entity);
-
             return await SaveFunctionalityBlockAsync();
         }
 
@@ -52,8 +43,56 @@ namespace ProjectCollaborationPlatform.BL.Services
             return new FunctionalityBlockDTO()
             {
                 Id = funcBlock.Id,
-                Task = funcBlock.Task
+                Task = funcBlock.Task,
+                Status = funcBlock.Status
             };
+        }
+
+        public async Task<bool> DeleteFunctionalityBlock(Guid id)
+        {
+            var entity = await _context.FunctionalityBlocks.Where(fb => fb.Id == id).FirstOrDefaultAsync();
+            if (entity == null)
+            {
+                return false;
+            }
+
+            _context.FunctionalityBlocks.Remove(entity);
+
+            return await SaveFunctionalityBlockAsync();
+        }
+
+        public async Task<List<FunctionalityBlockDTO>> GetFunctionalityBlocksByBoardId(Guid boardId, CancellationToken token)
+        {
+            var funcBlocks = await _context.FunctionalityBlocks
+                .Where(fb => fb.BoardID == boardId) 
+                .Select(fb => new FunctionalityBlockDTO
+                {
+                    Id = fb.Id,
+                    Task = fb.Task,
+                    Status = fb.Status
+                })
+                .ToListAsync(token);
+
+            return funcBlocks;
+        }
+
+        public async Task<bool> UpdateFunctionalityBlockStatus(Guid id, StatusEnum status)
+        {
+            var funckBlockToUpdate = await _context.FunctionalityBlocks.Where(fb => fb.Id == id).FirstOrDefaultAsync();
+
+            if (funckBlockToUpdate == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "FunctionalityBlock not found",
+                    Detail = "FunctionalityBlock with such id doesn't exist"
+                };
+            }
+
+            funckBlockToUpdate.Status = status;
+            _context.FunctionalityBlocks.Update(funckBlockToUpdate);
+            return await SaveFunctionalityBlockAsync();
         }
 
         public async Task<bool> SaveFunctionalityBlockAsync()

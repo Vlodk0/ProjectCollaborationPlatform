@@ -33,6 +33,7 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             var board = new Board()
             {
+                Id = boardDto.Id,
                 Name = boardDto.Name,
                 ProjectID = project.Id
             };
