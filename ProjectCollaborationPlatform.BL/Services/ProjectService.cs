@@ -145,6 +145,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                     Id = t.Id,
                     Title = t.Title,
                     Payment = t.Payment,
+                    BoardId = t.Board.Id,
                     Description = t.ProjectDetail.Description,
                     Technologies = t.ProjectTechnologies.Select(i => new DeveloperTechnologyDTO
                     {

@@ -6,6 +6,7 @@
         public string Title { get; set; }
         public int Payment { get; set; }
         public string Description { get; set; }
+        public Guid BoardId { get; set; }
         public List<DeveloperTechnologyDTO> Technologies { get; set; }
     }
 }
