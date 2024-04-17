@@ -133,6 +133,59 @@ namespace ProjectCollaborationPlatform.BL.Services
             return new PagedResponse<List<ProjectFullInfoDTO>>(result, filter.PageNumber, filter.PageSize, totalRecords, totalPages);
         }
 
+        public async Task<PagedResponse<List<ProjectFullInfoDTO>>> GetAllProjectsByProjectOwnerId(Guid id, PaginationFilter filter, CancellationToken token)
+        {
+            IQueryable<Project> query = _context.Projects.Where(po => po.ProjectOwnerID == id);
+
+            query = filter.SortColumn switch
+            {
+                "Payment" when filter.SortDirection == "asc" =>
+                    query.OrderBy(p => p.Payment),
+                "Payment" => query.OrderByDescending(p => p.Payment),
+                _ => query
+            };
+
+            query = query
+                .Skip(filter.PageNumber)
+                .Take(filter.PageSize);
+
+            var totalRecords = await _context.Projects.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
+
+            var result = await query
+                .Include(pd => pd.ProjectDetail)
+                .Include(pt => pt.ProjectTechnologies)
+                .Select(p => new ProjectFullInfoDTO()
+                {
+                    Id = p.Id,
+                    Payment = p.Payment,
+                    Title = p.Title,
+                    Description = p.ProjectDetail.Description,
+                    Technologies = p.ProjectTechnologies.Select(i => new DeveloperTechnologyDTO
+                    {
+                        Technology = i.Technology.Language,
+                        Framework = i.Technology.Framework
+                    }).ToList(),
+                }).ToListAsync(token);
+
+            return new PagedResponse<List<ProjectFullInfoDTO>>(result, filter.PageNumber, filter.PageSize, totalRecords, totalPages);
+        }
+
+        public async Task<List<ProjectDTO>> GetProjectOwnerListProjects(Guid projOwnerId, CancellationToken token)
+        {
+            var projects = await _context.Projects
+                .Where(po => po.ProjectOwnerID == projOwnerId)
+                .Select(pr => new ProjectDTO
+                {
+                    Id = pr.Id,
+                    Title = pr.Title,
+                    Payment = pr.Payment
+                })
+                .ToListAsync(token);
+
+            return projects;
+        }
+
         public async Task<GetProjectDTO> GetProjectById(Guid id, CancellationToken token)
         {
        

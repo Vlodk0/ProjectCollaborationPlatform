@@ -105,8 +105,8 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 throw new CustomApiException()
                 {
                     StatusCode = StatusCodes.Status404NotFound,
-                    Title = "Projects not found",
-                    Detail = "Project with such name not found"
+                    Title = "FunctionalityBlock not found",
+                    Detail = "FunctionalityBlock with such name not found"
                 };
             }
 

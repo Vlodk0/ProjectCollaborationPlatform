@@ -16,5 +16,7 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
         Task<bool> DeleteProjectByName(string name, CancellationToken token);
         Task<bool> SaveProjectAsync();
         Task<PagedResponse<List<ProjectFullInfoDTO>>> GetAllProjects(PaginationFilter filter, CancellationToken token);
+        Task<PagedResponse<List<ProjectFullInfoDTO>>> GetAllProjectsByProjectOwnerId(Guid id, PaginationFilter filter, CancellationToken token);
+        Task<List<ProjectDTO>> GetProjectOwnerListProjects(Guid projOwnerId, CancellationToken token);
     }
 }

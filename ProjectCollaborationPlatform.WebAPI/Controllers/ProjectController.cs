@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
+using ProjectCollaborationPlatform.BL.Services;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
@@ -66,6 +67,37 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             return Ok(projects);
         }
+
+        [HttpGet("my-projects")]
+        public async Task<IActionResult> GetAllProjectsByProjectOwnerId([FromQuery] int pageNumber, [FromQuery] int pageSize,
+    [FromQuery] string sortColumn, [FromQuery] string sortDirection, CancellationToken token)
+        {
+            Guid projOwnerId = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var filter = new PaginationFilter(pageNumber, pageSize, sortColumn, sortDirection);
+            var projects = await _projectService.GetAllProjectsByProjectOwnerId(projOwnerId, filter, token);
+
+            return Ok(projects);
+        }
+
+        [HttpGet("projectOwner/projects")]
+        public async Task<IActionResult> GetProjectOwnerProjects(CancellationToken token)
+        {
+            Guid projOwnerId = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var projects = await _projectService.GetProjectOwnerListProjects(projOwnerId, token);
+            if (projects == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project not found",
+                    Detail = "Project with such id doesn't exist"
+                };
+            }
+            return Ok(projects);
+        }
+
 
         [Authorize]
         [HttpPost]
