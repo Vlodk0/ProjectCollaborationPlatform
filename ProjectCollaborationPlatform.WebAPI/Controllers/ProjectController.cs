@@ -17,11 +17,13 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
     {
         private readonly IProjectService _projectService;
         private readonly ITechnologyService _technologyService;
+        private readonly IDeveloperService _developerService;
 
-        public ProjectController(IProjectService projectService, ITechnologyService technologyService)
+        public ProjectController(IProjectService projectService, ITechnologyService technologyService, IDeveloperService developerService)
         {
             _projectService = projectService;
             _technologyService = technologyService;
+            _developerService = developerService;
         }
 
         [Authorize]
@@ -252,6 +254,32 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [Authorize]
+        [HttpPost("developers/{id:Guid}")]
+        public async Task<IActionResult> AddDevelopersToProject([FromRoute] Guid id, List<Guid> developerId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var result = await _developerService.AddDeveloperForProject(id, developerId);
+
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while adding developers for project"
+                };
+            }
+        }
+
+        [Authorize]
         [HttpDelete("technologies/{id:Guid}")]
         public async Task<IActionResult> RemoveTechnologiesFromProject([FromRoute] Guid id, List<string> techId)
         {
@@ -272,7 +300,33 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     StatusCode = StatusCodes.Status500InternalServerError,
                     Title = "Server Error",
-                    Detail = "Error occured while removing technologies for project"
+                    Detail = "Error occured while removing technologies from project"
+                };
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("developers/{id:Guid}")]
+        public async Task<IActionResult> RemoveDevelopersFromProject([FromRoute] Guid id, List<Guid> developerId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var result = await _developerService.RemoveDeveloperFromProject(id, developerId);
+
+            if (result)
+            {
+                return Ok();
+            }
+            else
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while removing developers from project"
                 };
             }
         }

@@ -4,6 +4,8 @@ using ProjectCollaborationPlatform.BL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Pagination;
+using Microsoft.AspNetCore.Http;
+using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.BL.Services
 {
@@ -132,6 +134,80 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             };
             _context.Developers.Update(dev);
+            return await SaveDeveloperAsync();
+        }
+
+        public async Task<bool> AddDeveloperForProject(Guid id, List<Guid> devId)
+        {
+            var project = await _context.Projects.AnyAsync(i => i.Id == id);
+
+            if (!project)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project not found",
+                    Detail = "Project with such id not found"
+                };
+            }
+
+            var isDevExist = devId.All(devId => _context.Developers.Any(x => x.Id == devId));
+
+            if (!isDevExist)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Developers not found",
+                    Detail = "Developers with such ids not found"
+                };
+            }
+
+            var projDev = devId.Select(pd => new ProjectDeveloper
+            {
+                ProjectID = id,
+                DeveloperID = pd
+            }).ToList();
+
+            _context.ProjectDevelopers.AddRange(projDev); 
+            
+            return await SaveDeveloperAsync();
+        }
+
+        public async Task<bool> RemoveDeveloperFromProject(Guid id, List<Guid> devId)
+        {
+            var project = await _context.Projects.AnyAsync(i => i.Id == id);
+
+            if (!project)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Project not found",
+                    Detail = "Project with such id not found"
+                };
+            }
+
+            var isDevExist = devId.All(devId => _context.Developers.Any(x => x.Id == devId));
+
+            if (!isDevExist)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Developers not found",
+                    Detail = "Developers with such ids not found"
+                };
+            }
+
+            var projDev = devId.Select(pd => new ProjectDeveloper
+            {
+                ProjectID = id,
+                DeveloperID = pd
+            }).ToList();
+
+            _context.ProjectDevelopers.RemoveRange(projDev);
+
             return await SaveDeveloperAsync();
         }
     }
