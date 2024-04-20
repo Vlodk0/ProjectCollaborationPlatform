@@ -24,6 +24,7 @@ namespace ProjectCollaborationPlatform.WebAPI
             });
 
             builder.Services.AddControllers();
+            builder.Services.AddTransient<DBSeeder>();
             builder.Services.AddScoped<IDeveloperService, DeveloperService>();
             builder.Services.AddScoped<IProjectOwnerService, ProjectOwnerService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
@@ -81,6 +82,20 @@ namespace ProjectCollaborationPlatform.WebAPI
                     configuration.ReadFrom.Configuration(context.Configuration));
 
             var app = builder.Build();
+
+            if (args.Length == 1 && args[0].ToLower() == "seeddata")
+                SeedData(app);
+
+            void SeedData(IHost app)
+            {
+                var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+
+                using (var scope = scopedFactory.CreateScope())
+                {
+                    var service = scope.ServiceProvider.GetService<DBSeeder>();
+                    service.SeedTechnologies();
+                }
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
