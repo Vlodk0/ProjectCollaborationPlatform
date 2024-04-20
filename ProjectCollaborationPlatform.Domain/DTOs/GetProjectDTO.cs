@@ -8,5 +8,6 @@
         public string Description { get; set; }
         public Guid BoardId { get; set; }
         public List<DeveloperTechnologyDTO> Technologies { get; set; }
+        public List<DeveloperDTO> Developers { get; set; }
     }
 }

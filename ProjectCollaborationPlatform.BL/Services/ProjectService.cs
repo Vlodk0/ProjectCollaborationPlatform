@@ -26,6 +26,7 @@ namespace ProjectCollaborationPlatform.BL.Services
             {
                 Title = projectDTO.Title,
                 Payment = projectDTO.Payment,
+                ShortInfo = projectDTO.ShortInfo,
                 ProjectOwnerID = id,
             };
 
@@ -122,6 +123,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                     Id = p.Id,
                     Payment = p.Payment,
                     Title = p.Title,
+                    ShortInfo = p.ShortInfo,
                     Description = p.ProjectDetail.Description,
                     Technologies = p.ProjectTechnologies.Select(i => new DeveloperTechnologyDTO
                     {
@@ -160,6 +162,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                     Id = p.Id,
                     Payment = p.Payment,
                     Title = p.Title,
+                    ShortInfo = p.ShortInfo,
                     Description = p.ProjectDetail.Description,
                     Technologies = p.ProjectTechnologies.Select(i => new DeveloperTechnologyDTO
                     {
@@ -204,7 +207,12 @@ namespace ProjectCollaborationPlatform.BL.Services
                     {
                         Technology = i.Technology.Language,
                         Framework = i.Technology.Framework
-                    }).ToList()
+                    }).ToList(),
+                    Developers = t.ProjectDevelopers.Select(i => new DeveloperDTO
+                    {
+                        FirstName = i.Developer.FirstName, 
+                        LastName = i.Developer.LastName
+                    }).ToList(),
                 }).FirstAsync(token);
 
         }
@@ -249,6 +257,7 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             project.Title = projectDTO.Title;
             project.Payment = projectDTO.Payment;
+            project.ShortInfo = projectDTO.ShortInfo;
             _context.Projects.Update(project);
             return await SaveProjectAsync();
         }

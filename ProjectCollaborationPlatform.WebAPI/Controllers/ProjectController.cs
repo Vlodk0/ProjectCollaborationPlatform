@@ -253,9 +253,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("developers/{id:Guid}")]
-        public async Task<IActionResult> AddDevelopersToProject([FromRoute] Guid id, List<Guid> developerId)
+        public async Task<IActionResult> AddDevelopersToProject([FromRoute] Guid id, [FromBody] List<Guid> developerId)
         {
             if (!ModelState.IsValid)
             {

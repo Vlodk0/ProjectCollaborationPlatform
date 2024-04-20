@@ -101,6 +101,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                 .ThenInclude(t => t.Technology)
                 .Select(d => new PaginationDeveloperDTO()
                 {
+                    Id = d.Id,
                     FirstName = d.FirstName,
                     LastName = d.LastName,
                     Technologies = d.DeveloperTechnologies.Select(i => new DeveloperTechnologyDTO()

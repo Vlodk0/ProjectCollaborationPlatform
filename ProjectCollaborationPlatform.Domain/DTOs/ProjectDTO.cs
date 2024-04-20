@@ -7,5 +7,6 @@ namespace ProjectCollaborationPlatform.Domain.DTOs
         public Guid Id { get; set; }
         public string Title { get; set; }
         public int Payment {  get; set; }
+        public string ShortInfo {  get; set; }
     }
 }   
