@@ -103,7 +103,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateProject([FromBody] ProjectFullInfoDTO project, CancellationToken token)
+        public async Task<IActionResult> CreateProject([FromBody] CreateProjectDTO project, CancellationToken token)
         {
             Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
@@ -146,7 +146,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         [Authorize]
         [HttpPut("{id:Guid}")]
-        public async Task<IActionResult> UpdateProject([FromBody] ProjectDTO projectDTO, [FromRoute] Guid id, CancellationToken token)
+        public async Task<IActionResult> UpdateProject([FromBody] CreateProjectDTO projectDTO, [FromRoute] Guid id, CancellationToken token)
         {
 
             var projectToUpdate = await _projectService.GetProjectById(id, token);

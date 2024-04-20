@@ -20,7 +20,7 @@ namespace ProjectCollaborationPlatform.BL.Services
             _context = context;
         }
 
-        public async Task<bool> AddProject(ProjectFullInfoDTO projectDTO, Guid id, CancellationToken token)
+        public async Task<bool> AddProject(CreateProjectDTO projectDTO, Guid id, CancellationToken token)
         {
             var project = new Project()
             {
@@ -39,7 +39,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                     Title = "Server Error",
                     Detail = "Error occured while creating project"
                 };
-            }
+            }   
 
             var prj = await _context.Projects.Where(p => p.Title == projectDTO.Title).FirstOrDefaultAsync(token);
 
@@ -147,12 +147,12 @@ namespace ProjectCollaborationPlatform.BL.Services
                 _ => query
             };
 
+            var totalRecords = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
+
             query = query
                 .Skip(filter.PageNumber)
                 .Take(filter.PageSize);
-
-            var totalRecords = await _context.Projects.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
 
             var result = await query
                 .Include(pd => pd.ProjectDetail)
@@ -251,7 +251,7 @@ namespace ProjectCollaborationPlatform.BL.Services
             }
         }
 
-        public async Task<bool> UpdateProject(ProjectDTO projectDTO, Guid id)
+        public async Task<bool> UpdateProject(CreateProjectDTO projectDTO, Guid id)
         {
             var project = await _context.Projects.Where(e => e.Id == id).FirstOrDefaultAsync();
 

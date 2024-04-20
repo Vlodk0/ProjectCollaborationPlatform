@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.DAL.Data.Models;
-using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.BL.Services

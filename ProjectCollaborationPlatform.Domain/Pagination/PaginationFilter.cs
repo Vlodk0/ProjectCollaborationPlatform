@@ -19,8 +19,8 @@
 
         public PaginationFilter(int pageNumber, int pageSize, string sortColumn, string sortDirection)
         {
-            PageNumber = pageNumber < 1? 1 : pageNumber;    
-            PageSize = pageSize > 10 ? 10 : pageSize;
+            PageNumber = pageNumber < 1? 0 : pageNumber;    
+            PageSize = pageSize < 15 ? 15 : pageSize;
             SortColumn = sortColumn;
             SortDirection = sortDirection;
         }

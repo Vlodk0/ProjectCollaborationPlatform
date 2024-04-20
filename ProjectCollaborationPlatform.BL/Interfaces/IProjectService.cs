@@ -9,8 +9,8 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
     {
         Task<ProjectDTO> GetProjectByName(string name, CancellationToken token);
         Task<GetProjectDTO> GetProjectById(Guid id, CancellationToken token);
-        Task<bool> AddProject(ProjectFullInfoDTO projectDTO, Guid id, CancellationToken token);
-        Task<bool> UpdateProject(ProjectDTO projectDTO, Guid id);
+        Task<bool> AddProject(CreateProjectDTO projectDTO, Guid id, CancellationToken token);
+        Task<bool> UpdateProject(CreateProjectDTO projectDTO, Guid id);
         Task<bool> UpdateProjectDetails(Guid id, string description);
         Task<bool> DeleteProjectById(Guid id, CancellationToken token);
         Task<bool> DeleteProjectByName(string name, CancellationToken token);
