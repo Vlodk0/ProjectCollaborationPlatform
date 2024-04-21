@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.DAL.Data.Models;
+using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
+using System.Threading;
 
 namespace ProjectCollaborationPlatform.BL.Services
 {
@@ -170,6 +172,35 @@ namespace ProjectCollaborationPlatform.BL.Services
         {
             var saved = await _context.SaveChangesAsync();
             return saved > 0;
+        }
+
+        public async Task<List<TechnologyDTO>> GetAllTechnologies(CancellationToken token)
+        {
+            var techs = await _context.Technologies
+                .Select(t => new TechnologyDTO
+                {
+                    Id = t.Id,
+                    Framework = t.Framework,
+                    Technology = t.Language,
+                }).ToListAsync(token);
+
+            return techs;
+        }
+
+        public async Task<List<TechnologyDTO>> GetAllTechnologiesByProjectId(Guid projId, CancellationToken token)
+        {
+            var technologies = await _context.Projects
+                            .Where(p => p.Id == projId)
+                            .SelectMany(p => p.ProjectTechnologies.Select(pt => pt.Technology))
+                            .Select(t => new TechnologyDTO
+                            {
+                                Id = t.Id,
+                                Framework = t.Framework,
+                                Technology = t.Language
+                            })
+                            .ToListAsync(token);
+
+            return technologies;
         }
     }
 }

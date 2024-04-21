@@ -178,10 +178,10 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         [Authorize]
         [HttpPut("ProjectDetails/{id:Guid}")]
-        public async Task<IActionResult> UpdateProjectDetails([FromBody] ProjectDetailsDTO projectDTO, [FromRoute] Guid id, CancellationToken token)
+        public async Task<IActionResult> UpdateProjectDetails([FromBody] ProjectDetailDTO projectDetailDTO, [FromRoute] Guid id, CancellationToken token)
         {
 
-            if (await _projectService.UpdateProjectDetails(id, projectDTO.Description))
+            if (await _projectService.UpdateProjectDetails(id, projectDetailDTO.Description))
             {
                 return StatusCode(StatusCodes.Status200OK, "Project details updated succesfully");
             }
