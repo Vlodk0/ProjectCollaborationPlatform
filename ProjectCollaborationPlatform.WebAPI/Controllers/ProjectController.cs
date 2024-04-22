@@ -197,10 +197,10 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [Authorize]
-        [HttpDelete("{name}")]
-        public async Task<ActionResult<Project>> DeleteProjectByName([FromRoute] string name, CancellationToken token)
+        [HttpDelete("{id:Guid}")]
+        public async Task<ActionResult<Project>> DeleteProjectById([FromRoute] Guid id, CancellationToken token)
         {
-            var projectToDelete = await _projectService.GetProjectByName(name, token);
+            var projectToDelete = await _projectService.GetProjectById(id, token);
 
             if (projectToDelete == null)
             {
@@ -212,9 +212,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 };
             }
 
-            if (await _projectService.DeleteProjectByName(name, token))
+            if (await _projectService.DeleteProjectById(id, token))
             {
-                return Ok("Project deleted successfully");
+                return NoContent();
             }
             else
             {

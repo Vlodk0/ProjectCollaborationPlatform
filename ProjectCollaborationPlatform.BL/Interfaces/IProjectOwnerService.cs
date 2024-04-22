@@ -1,4 +1,5 @@
 ﻿using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Pagination;
 
 namespace ProjectCollaborationPlatform.BL.Interfaces
 {
@@ -11,5 +12,7 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
         Task<bool> DeleteProjectOwner(Guid id);
         Task<bool> SaveProjectOwnerAsync();
         Task<bool> IsProjectOwnerExists(string email);
+        Task<PagedResponse<List<ProjectOwnerPaginationDTO>>> GetAllProjectOwners(PaginationFilter filter, CancellationToken token);
+
     }
 }

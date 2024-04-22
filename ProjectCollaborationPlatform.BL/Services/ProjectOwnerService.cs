@@ -3,7 +3,7 @@ using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
-
+using ProjectCollaborationPlatform.Domain.Pagination;
 
 namespace ProjectCollaborationPlatform.BL.Services
 {
@@ -31,23 +31,46 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<bool> DeleteProjectOwner(Guid id)
         {
-            var projectOwner = await _context.Set<ProjectOwner>().FindAsync(id);
+            var projectOwner = await _context.ProjectOwners.Where(i => i.Id == id).FirstOrDefaultAsync();
             if (projectOwner == null)
             {
                 return false;
             }
             var deletedProjectOwner = new ProjectOwner()
             {
-                Id = projectOwner.Id,
                 FirstName = projectOwner.FirstName,
                 LastName = projectOwner.LastName,
                 Email = projectOwner.Email,
                 IsDeleted = true,
             };
 
-            _context.Set<ProjectOwner>().Update(deletedProjectOwner);
+            _context.ProjectOwners.Remove(projectOwner);
+            _context.ProjectOwners.Update(deletedProjectOwner);
 
             return await SaveProjectOwnerAsync();
+        }
+
+        public async Task<PagedResponse<List<ProjectOwnerPaginationDTO>>> GetAllProjectOwners(PaginationFilter filter, CancellationToken token)
+        {
+            IQueryable<ProjectOwner> query = _context.ProjectOwners
+                .Where(i => i.IsDeleted == false);
+
+            var totalRecords = await query.CountAsync(token);
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
+
+            query = query
+                .Skip(filter.PageNumber)
+                .Take(filter.PageSize);
+
+            var result = await query
+                .Select(t => new ProjectOwnerPaginationDTO
+                {
+                    Id = t.Id,
+                    FirstName = t.FirstName,
+                    LastName = t.LastName,
+                }).ToListAsync(token);
+
+            return new PagedResponse<List<ProjectOwnerPaginationDTO>>(result, filter.PageNumber, filter.PageSize, totalRecords, totalPages);
         }
 
         public async Task<ProjectOwnerDTO> GetProjectOwnerByEmail(string email, CancellationToken token)

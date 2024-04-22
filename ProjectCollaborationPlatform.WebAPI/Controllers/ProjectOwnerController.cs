@@ -4,6 +4,7 @@ using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.BL.Services;
 using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
+using ProjectCollaborationPlatform.Domain.Pagination;
 using System.Security.Claims;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
@@ -211,6 +212,15 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     Detail = "Error occured while server running"
                 };
             }
+        }
+
+        [HttpGet("projectOwners")]
+        public async Task<IActionResult> GetAllProjectOwners([FromQuery] PaginationFilter paginationFilter, CancellationToken token)
+        {
+            var filter = new PaginationFilter(paginationFilter.PageNumber, paginationFilter.PageSize);
+            var developers = await _projectOwnerService.GetAllProjectOwners(filter, token);
+
+            return Ok(developers);
         }
 
     }

@@ -34,21 +34,20 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<bool> DeleteDeveloper(Guid id)
         {
-            var dev = await _context.Set<Developer>().FindAsync(id);
+            var dev = await _context.Developers.Where(i => i.Id == id).FirstOrDefaultAsync();
             if (dev == null)
             {
                 return false;
             }
             var deletedDev = new Developer()
             {
-                Id = dev.Id,
                 FirstName = dev.FirstName,
                 LastName = dev.LastName,
                 Email = dev.Email,
                 IsDeleted = true,
             };
 
-            _context.Set<Developer>().Update(deletedDev);
+            _context.Developers.Update(deletedDev);
 
             return await SaveDeveloperAsync();
         }

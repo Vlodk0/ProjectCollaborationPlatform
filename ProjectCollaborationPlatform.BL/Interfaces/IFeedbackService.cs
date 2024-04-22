@@ -9,6 +9,7 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
         Task<bool> UpdateFeedback(Guid id, FeedbackDTO feedbackDTO);
         Task<bool> DeleteFeedback(Guid id, CancellationToken token);
         Task<PagedResponse<List<GetFeedbackDTO>>> GetAllDeveloperFeedbacks(PaginationFilter filter, Guid id, CancellationToken token);
+        Task<PagedResponse<List<GetFeedbackDTO>>> GetAllFeedbacks(PaginationFilter filter, CancellationToken token);
         Task<bool> SaveFeedbackAsync();
     }
 }

@@ -88,6 +88,27 @@ namespace ProjectCollaborationPlatform.BL.Services
             return new PagedResponse<List<GetFeedbackDTO>>(funcBlocks, filter.PageNumber, filter.PageSize, totalRecords, totalPages);
         }
 
+        public async Task<PagedResponse<List<GetFeedbackDTO>>> GetAllFeedbacks(PaginationFilter filter, CancellationToken token)
+        {
+            IQueryable<Feedback> query = _context.Feedbacks;
+
+            var totalRecords = await query.CountAsync(token);
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
+
+            query = query
+                .Skip(filter.PageNumber)
+                .Take(filter.PageSize);
+
+            var result = await query
+                .Select(t => new GetFeedbackDTO
+                {
+                    Id = t.Id,
+                    Content = t.Content
+                }).ToListAsync(token);
+
+            return new PagedResponse<List<GetFeedbackDTO>>(result, filter.PageNumber, filter.PageSize, totalRecords, totalPages);
+        }
+
         public async Task<bool> SaveFeedbackAsync()
         {
             var saved = await _context.SaveChangesAsync();

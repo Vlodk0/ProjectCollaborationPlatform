@@ -113,6 +113,15 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             return Ok(feedbacks);
         }
+
+        [HttpGet("feedbacks")]
+        public async Task<IActionResult> GetAllFeedbacks([FromQuery] PaginationFilter paginationFilter, CancellationToken token)
+        {
+            var filter = new PaginationFilter(paginationFilter.PageNumber, paginationFilter.PageSize);
+            var developers = await _feedbackService.GetAllFeedbacks(filter, token);
+
+            return Ok(developers);
+        }
     }
 
     
