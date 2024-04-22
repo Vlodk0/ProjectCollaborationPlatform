@@ -53,18 +53,18 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveDeveloperAsync();
         }
 
-        public async Task<DeveloperDTO> GetDeveloperByEmail(string email, CancellationToken token)
-        {
-            var dev = await _context.Developers.Where(e => e.Email == email).FirstOrDefaultAsync(token);
+        //public async Task<DeveloperDTO> GetDeveloperByEmail(string email, CancellationToken token)
+        //{
+        //    var dev = await _context.Developers.Where(e => e.Email == email).FirstOrDefaultAsync(token);
 
-            return new DeveloperDTO()
-            {
-                Id = dev.Id,
-                Email = dev.Email,
-                FirstName = dev.FirstName,
-                LastName = dev.LastName,
-            };
-        }
+        //    return new DeveloperDTO()
+        //    {
+        //        Id = dev.Id,
+        //        Email = dev.Email,
+        //        FirstName = dev.FirstName,
+        //        LastName = dev.LastName,
+        //    };
+        //}
 
         public async Task<DeveloperDTO> GetDeveloperById(Guid id, CancellationToken token)
         {

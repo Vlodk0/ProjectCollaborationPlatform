@@ -16,10 +16,9 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
         public DbSet<ProjectDetail> ProjectDetails { get; set; }
         public DbSet<ProjectDeveloper> ProjectDevelopers { get; set; }
         public DbSet<ProjectTechnology> ProjectTechnologies { get; set; }
-        public DbSet<Team> Teams { get; set; }
-        public DbSet<TeamDeveloper> TeamDevelopers { get; set; }
         public DbSet<Technology> Technologies { get; set; }
         public DbSet<PhotoFile> PhotoFiles { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<ProjectOwner> ProjectOwners { get; set; }
 
         public ProjectPlatformContext()
@@ -42,10 +41,10 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
             builder.ApplyConfiguration(new ProjectDetailConfiguration()); 
             builder.ApplyConfiguration(new ProjectDeveloperConfiguration()); 
             builder.ApplyConfiguration(new ProjectTechnologyConfiguration()); 
-            builder.ApplyConfiguration(new TeamDeveloperConfiguration()); 
             builder.ApplyConfiguration(new PhotoFileConfiguration()); 
             builder.ApplyConfiguration(new DeveloperConfiguration());
             builder.ApplyConfiguration(new ProjectOwnerConfiguration());
+            builder.ApplyConfiguration(new FeedbackConfiguration());
             base.OnModelCreating(builder);
         }
 

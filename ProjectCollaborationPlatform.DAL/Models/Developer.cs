@@ -13,7 +13,7 @@ namespace ProjectCollaborationPlatform.DAL.Data.Models
         public PhotoFile PhotoFile { get; set; }
         public List<DeveloperTechnology> DeveloperTechnologies {  get; set; }
         public List<ProjectDeveloper> ProjectDevelopers { get; set; }
-        public List<TeamDeveloper> TeamDevelopers { get; set; }
+        public List<Feedback> Feedbacks { get; set; }
         
     }
 }
