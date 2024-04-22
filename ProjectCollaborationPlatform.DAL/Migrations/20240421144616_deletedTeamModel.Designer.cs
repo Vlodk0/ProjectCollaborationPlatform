@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 
@@ -11,9 +12,10 @@ using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 namespace ProjectCollaborationPlatform.Data.Migrations
 {
     [DbContext(typeof(ProjectPlatformContext))]
-    partial class ProjectPlatformContextModelSnapshot : ModelSnapshot
+    [Migration("20240421144616_deletedTeamModel")]
+    partial class deletedTeamModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -230,31 +232,6 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.ToTable("Technologies");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Models.Feedback", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("DeveloperId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProjectOwnerID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeveloperId");
-
-                    b.HasIndex("ProjectOwnerID");
-
-                    b.ToTable("Feedbacks");
-                });
-
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Models.PhotoFile", b =>
                 {
                     b.Property<Guid>("Id")
@@ -389,25 +366,6 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.Navigation("Technology");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Models.Feedback", b =>
-                {
-                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Developer", "Developer")
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("DeveloperId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.ProjectOwner", "ProjectOwner")
-                        .WithMany("Feedbacks")
-                        .HasForeignKey("ProjectOwnerID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Developer");
-
-                    b.Navigation("ProjectOwner");
-                });
-
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Models.PhotoFile", b =>
                 {
                     b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Developer", "Developer")
@@ -436,8 +394,6 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                 {
                     b.Navigation("DeveloperTechnologies");
 
-                    b.Navigation("Feedbacks");
-
                     b.Navigation("PhotoFile")
                         .IsRequired();
 
@@ -459,8 +415,6 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
             modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectOwner", b =>
                 {
-                    b.Navigation("Feedbacks");
-
                     b.Navigation("PhotoFile")
                         .IsRequired();
 

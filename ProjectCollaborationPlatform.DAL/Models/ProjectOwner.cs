@@ -12,5 +12,6 @@ namespace ProjectCollaborationPlatform.DAL.Data.Models
         public string Email { get; set; }
         public PhotoFile PhotoFile { get; set; }
         public List<Project> Projects { get; set; }
+        public List<Feedback> Feedbacks { get; set; }
     }
 }

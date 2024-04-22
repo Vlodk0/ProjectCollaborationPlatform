@@ -76,35 +76,35 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet("{email}")]
-        public async Task<IActionResult> GetDeveloperByEmail([FromRoute] string email, CancellationToken token)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+        //[Authorize]
+        //[HttpGet("{email}")]
+        //public async Task<IActionResult> GetDeveloperByEmail([FromRoute] string email, CancellationToken token)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            var usr = await _developerService.GetDeveloperByEmail(email, token);
+        //    var usr = await _developerService.GetDeveloperByEmail(email, token);
 
-            if (usr != null)
-            {
-                return Ok(new
-                {
-                    message = "User found"
-                });
-            }
-            else
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Title = "Not found",
-                    Detail = "User not found"
-                };
-            }
+        //    if (usr != null)
+        //    {
+        //        return Ok(new
+        //        {
+        //            message = "User found"
+        //        });
+        //    }
+        //    else
+        //    {
+        //        throw new CustomApiException()
+        //        {
+        //            StatusCode = StatusCodes.Status404NotFound,
+        //            Title = "Not found",
+        //            Detail = "User not found"
+        //        };
+        //    }
 
-        }
+        //}
 
         [Authorize]
         [HttpGet]
@@ -128,6 +128,26 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             {
                 message = "User exists"
             });
+
+        }
+
+        [Authorize]
+        [HttpGet("{id:Guid}")]
+        public async Task<IActionResult> GetDeveloper([FromRoute] Guid id, CancellationToken token)
+        {
+            var dev = await _developerService.GetDeveloperById(id, token);
+
+            if (dev == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "User not found",
+                    Detail = "User with such id not found"
+                };
+            }
+
+            return Ok(dev);
 
         }
 

@@ -134,8 +134,8 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 throw new CustomApiException()
                 {
                     StatusCode = StatusCodes.Status404NotFound,
-                    Title = "Project not found",
-                    Detail = "Project with such id doesn't exist"
+                    Title = "Board not found",
+                    Detail = "Board with such id doesn't exist"
                 };
             }
             return Ok(funcBlock);

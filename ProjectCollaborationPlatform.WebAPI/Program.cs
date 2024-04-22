@@ -29,7 +29,7 @@ namespace ProjectCollaborationPlatform.WebAPI
             builder.Services.AddScoped<IProjectOwnerService, ProjectOwnerService>();
             builder.Services.AddScoped<IProjectService, ProjectService>();
             builder.Services.AddScoped<IBoardService, BoardService>();
-            builder.Services.AddScoped<ITeamService, TeamService>();
+            builder.Services.AddScoped<IFeedbackService, FeedbackService>();
             builder.Services.AddScoped<IFunctionalityBlockService, FunctionalityBlockService>();
             builder.Services.AddScoped<ITechnologyService, TechnologyService>();
             builder.Services.AddTransient<IPhotoManageService, PhotoManageService>();
