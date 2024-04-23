@@ -7,7 +7,7 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
     {
         Task<DeveloperDTO> GetDeveloperById(Guid id, CancellationToken token);
         Task<bool> AddDeveloper(Guid id, DeveloperDTO developer);
-        Task<bool> UpdateDeveloper(DeveloperDTO developerDTO);
+        Task<bool> UpdateDeveloper(Guid id, UpdateUserDTO userDTO);
         Task<bool> DeleteDeveloper(Guid id);
         Task<bool> SaveDeveloperAsync();
         Task<bool> IsDeveloperExists(string email);

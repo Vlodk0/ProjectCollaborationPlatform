@@ -8,7 +8,7 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
         Task<ProjectOwnerDTO> GetProjectOwnerById(Guid id, CancellationToken token);
         Task<ProjectOwnerDTO> GetProjectOwnerByEmail(string email, CancellationToken token);
         Task<bool> AddProjectOwner(Guid id, ProjectOwnerDTO projectOwnerDTO);
-        Task<bool> UpdateProjectOwner(ProjectOwnerDTO projectOwnerDTO);
+        Task<bool> UpdateProjectOwner(Guid id, UpdateUserDTO userDTO);
         Task<bool> DeleteProjectOwner(Guid id);
         Task<bool> SaveProjectOwnerAsync();
         Task<bool> IsProjectOwnerExists(string email);

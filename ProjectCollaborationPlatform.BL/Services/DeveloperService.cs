@@ -80,6 +80,8 @@ namespace ProjectCollaborationPlatform.BL.Services
                 Email = dev.Email,
                 FirstName = dev.FirstName,
                 LastName = dev.LastName,
+                RoleName = "Dev",
+                IsDeleted = dev.IsDeleted
             };
 
         }
@@ -122,17 +124,12 @@ namespace ProjectCollaborationPlatform.BL.Services
             return saved > 0;
         }
 
-        public async Task<bool> UpdateDeveloper(DeveloperDTO developerDTO)
+        public async Task<bool> UpdateDeveloper(Guid id, UpdateUserDTO userDTO)
         {
-            var dev = await _context.Developers.Where(e => e.Email == developerDTO.Email).FirstOrDefaultAsync();
-            dev = new Developer()
-            {
-                FirstName = developerDTO.FirstName,
-                LastName = developerDTO.LastName,
-                Id = developerDTO.Id,
-                IsDeleted = false
+            var dev = await _context.Developers.Where(e => e.Id == id).FirstOrDefaultAsync();
 
-            };
+            dev.FirstName = userDTO.FirstName;
+            dev.LastName = userDTO.LastName;
             _context.Developers.Update(dev);
             return await SaveDeveloperAsync();
         }

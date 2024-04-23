@@ -101,6 +101,8 @@ namespace ProjectCollaborationPlatform.BL.Services
                 Email = projectOwner.Email,
                 FirstName = projectOwner.FirstName,
                 LastName = projectOwner.LastName,
+                RoleName = "ProjectOwner",
+                IsDeleted = projectOwner.IsDeleted,
             };
         }
 
@@ -113,17 +115,12 @@ namespace ProjectCollaborationPlatform.BL.Services
             return saved > 0;
         }
 
-        public async Task<bool> UpdateProjectOwner(ProjectOwnerDTO projectOwnerDTO)
+        public async Task<bool> UpdateProjectOwner(Guid id, UpdateUserDTO userDTO)
         {
-            var projectOwner = await _context.ProjectOwners.Where(e => e.Email == projectOwnerDTO.Email).FirstOrDefaultAsync();
-            projectOwner = new ProjectOwner()
-            {
-                FirstName = projectOwnerDTO.FirstName,
-                LastName = projectOwnerDTO.LastName,
-                Id = projectOwnerDTO.Id,
-                IsDeleted = false
+            var projectOwner = await _context.ProjectOwners.Where(e => e.Id == id).FirstOrDefaultAsync();
 
-            };
+            projectOwner.FirstName = userDTO.FirstName;
+            projectOwner.LastName = userDTO.LastName;
             _context.ProjectOwners.Update(projectOwner);
             return await SaveProjectOwnerAsync();
         }

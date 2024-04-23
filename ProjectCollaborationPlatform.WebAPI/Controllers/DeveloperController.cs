@@ -182,35 +182,35 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return File(result.Item1, result.Item2, result.Item3);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateDeveloper([FromBody] DeveloperDTO developerDTO, CancellationToken token)
-        {
-            var userToUpdate = await _developerService.GetDeveloperById(developerDTO.Id, token);
+        //[HttpPut]
+        //public async Task<IActionResult> UpdateDeveloper([FromBody] DeveloperDTO developerDTO, CancellationToken token)
+        //{
+        //    var userToUpdate = await _developerService.GetDeveloperById(developerDTO.Id, token);
 
-            if (userToUpdate == null)
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Title = "User not found",
-                    Detail = "User with such id not found"
-                };
-            }
+        //    if (userToUpdate == null)
+        //    {
+        //        throw new CustomApiException()
+        //        {
+        //            StatusCode = StatusCodes.Status404NotFound,
+        //            Title = "User not found",
+        //            Detail = "User with such id not found"
+        //        };
+        //    }
 
-            if (await _developerService.UpdateDeveloper(developerDTO))
-            {
-                return StatusCode(StatusCodes.Status200OK, "User succesfully updated");
-            }
-            else
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Title = "Server Error",
-                    Detail = "Error occured while server running"
-                };
-            }
-        }
+        //    if (await _developerService.UpdateDeveloper(developerDTO))
+        //    {
+        //        return StatusCode(StatusCodes.Status200OK, "User succesfully updated");
+        //    }
+        //    else
+        //    {
+        //        throw new CustomApiException()
+        //        {
+        //            StatusCode = StatusCodes.Status500InternalServerError,
+        //            Title = "Server Error",
+        //            Detail = "Error occured while server running"
+        //        };
+        //    }
+        //}
 
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> DeleteDeveloper([FromRoute] Guid id, CancellationToken token)

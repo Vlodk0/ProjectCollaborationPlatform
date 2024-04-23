@@ -153,35 +153,35 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return File(result.Item1, result.Item2, result.Item3);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateProjectOwner([FromBody] ProjectOwnerDTO projectOwnerDTO, CancellationToken token)
-        {
-            var projectOwnerToUpdate = await _projectOwnerService.GetProjectOwnerByEmail(projectOwnerDTO.Email, token);
+        //[HttpPut]
+        //public async Task<IActionResult> UpdateProjectOwner([FromBody] ProjectOwnerDTO projectOwnerDTO, CancellationToken token)
+        //{
+        //    var projectOwnerToUpdate = await _projectOwnerService.GetProjectOwnerByEmail(projectOwnerDTO.Email, token);
 
-            if (projectOwnerToUpdate == null)
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Title = "User not found",
-                    Detail = "User with such id not found"
-                };
-            }
+        //    if (projectOwnerToUpdate == null)
+        //    {
+        //        throw new CustomApiException()
+        //        {
+        //            StatusCode = StatusCodes.Status404NotFound,
+        //            Title = "User not found",
+        //            Detail = "User with such id not found"
+        //        };
+        //    }
 
-            if (await _projectOwnerService.UpdateProjectOwner(projectOwnerDTO))
-            {
-                return StatusCode(StatusCodes.Status200OK, "User succesfully updated");
-            }
-            else
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Title = "Server Error",
-                    Detail = "Error occured while server running"
-                };
-            }
-        }
+        //    if (await _projectOwnerService.UpdateProjectOwner(projectOwnerDTO))
+        //    {
+        //        return StatusCode(StatusCodes.Status200OK, "User succesfully updated");
+        //    }
+        //    else
+        //    {
+        //        throw new CustomApiException()
+        //        {
+        //            StatusCode = StatusCodes.Status500InternalServerError,
+        //            Title = "Server Error",
+        //            Detail = "Error occured while server running"
+        //        };
+        //    }
+        //}
 
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> DeleteProjectOwner([FromRoute] Guid id, CancellationToken token)
