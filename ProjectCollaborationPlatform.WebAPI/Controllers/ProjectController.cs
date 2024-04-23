@@ -26,7 +26,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _developerService = developerService;
         }
 
-        [Authorize(Policy = "ProjectOwnerRole, DeveloperRole, AdminRole")]
+        [Authorize]
         [HttpGet("{name}")]
         public async Task<IActionResult> GetProjectByName([FromRoute] string name, CancellationToken token)
         {
@@ -80,6 +80,19 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             var filter = new PaginationFilter(pageNumber, pageSize, sortColumn, sortDirection);
             var projects = await _projectService.GetAllProjectsByProjectOwnerId(projOwnerId, filter, token);
+
+            return Ok(projects);
+        }
+
+        [Authorize(Policy = "DeveloperRole")]
+        [HttpGet("dev/my-projects")]
+        public async Task<IActionResult> GetAllProjectsWhereDeveloperExists([FromQuery] int pageNumber, [FromQuery] int pageSize,
+[FromQuery] string sortColumn, [FromQuery] string sortDirection, CancellationToken token)
+        {
+            Guid devId = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var filter = new PaginationFilter(pageNumber, pageSize, sortColumn, sortDirection);
+            var projects = await _projectService.GetAllProjectsWhereDevsExists(devId, filter, token);
 
             return Ok(projects);
         }

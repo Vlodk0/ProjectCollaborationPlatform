@@ -270,5 +270,46 @@ namespace ProjectCollaborationPlatform.BL.Services
             _context.ProjectDetails.Update(projectDetail);
             return await SaveProjectAsync();
         }
+
+        public async Task<PagedResponse<List<ProjectFullInfoDTO>>> GetAllProjectsWhereDevsExists(Guid id, PaginationFilter filter, CancellationToken token)
+        {
+            IQueryable<Project> query = _context.Projects
+                .Include(pd => pd.ProjectDevelopers)
+                .Where(i => i.ProjectDevelopers.Any(i => i.DeveloperID == id));
+
+            query = filter.SortColumn switch
+            {
+                "Payment" when filter.SortDirection == "asc" =>
+                    query.OrderBy(p => p.Payment),
+                "Payment" => query.OrderByDescending(p => p.Payment),
+                _ => query
+            };
+
+            var totalRecords = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
+
+            query = query
+                .Skip(filter.PageNumber)
+                .Take(filter.PageSize);
+
+            var result = await query
+                .Include(pd => pd.ProjectDetail)
+                .Include(pt => pt.ProjectTechnologies)
+                .Select(p => new ProjectFullInfoDTO()
+                {
+                    Id = p.Id,
+                    Payment = p.Payment,
+                    Title = p.Title,
+                    ShortInfo = p.ShortInfo,
+                    Description = p.ProjectDetail.Description,
+                    Technologies = p.ProjectTechnologies.Select(i => new DeveloperTechnologyDTO
+                    {
+                        Technology = i.Technology.Language,
+                        Framework = i.Technology.Framework
+                    }).ToList(),
+                }).ToListAsync(token);
+
+            return new PagedResponse<List<ProjectFullInfoDTO>>(result, filter.PageNumber, filter.PageSize, totalRecords, totalPages);
+        }
     }
 }
