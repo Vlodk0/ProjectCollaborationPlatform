@@ -8,6 +8,7 @@ using System.Security.Claims;
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
     [Route("api/Developer/Technologies")]
+    [Authorize(Policy = "DeveloperRole")]
     [ApiController]
     public class DeveloperTechnologyController : ControllerBase
     {
@@ -28,7 +29,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 return BadRequest();
             }
 
-            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));   
 
             var result = await _technologyService.AddTechnologyForDeveloper(id, techId);
 

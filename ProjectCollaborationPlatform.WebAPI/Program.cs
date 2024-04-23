@@ -6,6 +6,7 @@ using ProjectCollaborationPlatform.BL.Services;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.WebAPI.Helpers.ErrorFilter;
 using Serilog;
+using System.Security.Claims;
 using System.Text;
 
 namespace ProjectCollaborationPlatform.WebAPI
@@ -77,6 +78,19 @@ namespace ProjectCollaborationPlatform.WebAPI
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:SecretKey"])),
                     };
                 });
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ProjectOwnerRole",
+                    policy => policy.RequireClaim(ClaimTypes.Role, "ProjectOwner"));
+                options.AddPolicy("DeveloperRole",
+                    policy => policy.RequireClaim(ClaimTypes.Role, "Dev"));
+                options.AddPolicy("AdminRole",
+                    policy => policy.RequireClaim(ClaimTypes.Role, "Admin"));
+                options.AddPolicy("AdminProjectOwnerRole",
+                    policy => policy.RequireClaim(ClaimTypes.Role, "ProjectOwner", "Admin"));
+                options.AddPolicy("DevProjectOwnerRole",
+                    policy => policy.RequireClaim(ClaimTypes.Role, "ProjectOwner", "Dev"));
+            });
 
             builder.Host.UseSerilog((context, configuration) =>
                     configuration.ReadFrom.Configuration(context.Configuration));

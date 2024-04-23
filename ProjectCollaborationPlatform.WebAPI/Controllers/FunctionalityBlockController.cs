@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.BL.Services;
 using ProjectCollaborationPlatform.Domain.DTOs;
@@ -9,6 +10,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
 
     [Route("api/[controller]")]
+    [Authorize(Policy = "DevProjectOwnerRole")]
     [ApiController]
     public class FunctionalityBlockController : ControllerBase
     {
@@ -64,7 +66,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [HttpPut("{id:Guid}")]
+        [HttpPatch("{id:Guid}")]
         public async Task<IActionResult> UpdateFunctionalityBlock([FromBody] FunctionalityBlockDTO functionalityBlockDTO,
             [FromRoute] Guid id, CancellationToken token)
         {
@@ -82,7 +84,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             if (await _functionalityBlockService.UpdateFunctionalityBlock(id, functionalityBlockDTO.Task))
             {
-                return Ok("FunctionalityBlock updated successfully");
+                return NoContent();
             }
             else
             {
@@ -141,7 +143,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return Ok(funcBlock);
         }
 
-        [HttpPatch("{id:Guid}")]
+        [HttpPatch("task/{id:Guid}")]
         public async Task<IActionResult> UpdateFunctionalityBlockByStatus([FromRoute] Guid id, [FromBody] StatusEnum status, 
             CancellationToken token)
         {
@@ -159,7 +161,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             if (await _functionalityBlockService.UpdateFunctionalityBlockStatus(id, status))
             {
-                return Ok("Status updated successfully");
+                return NoContent();
             }
             else
             {

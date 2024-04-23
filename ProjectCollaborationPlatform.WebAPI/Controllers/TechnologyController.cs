@@ -16,7 +16,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _technologyService = technologyService;
         }
 
-        [Authorize]
+        [Authorize(Policy = "DeveloperRole")]
         [HttpGet]
         public async Task<IActionResult> GetAllTechnologies(CancellationToken token)
         {

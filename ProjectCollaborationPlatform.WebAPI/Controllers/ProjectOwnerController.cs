@@ -23,7 +23,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _photoService = photoManageService;
         }
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpPost]
         public async Task<IActionResult> CreateProjectOwner(CreateProjectOwnerDTO projectOwnerDTO, CancellationToken token)
             {
@@ -72,34 +72,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
-        [HttpGet("{email}")]
-        public async Task<IActionResult> GetProjectOwnerByEmail([FromRoute] string email, CancellationToken token)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            var usr = await _projectOwnerService.GetProjectOwnerByEmail(email, token);
-
-            if (usr != null )
-            {
-                return Ok();
-            }
-            else
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Title = "Not found",
-                    Detail = "User not found"
-                };
-            }
-
-        }
-
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpGet]
         public async Task<IActionResult> GetProjectOwnerById(CancellationToken token)
         {
@@ -121,7 +94,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         }
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpPost("photo")]
         public async Task<IActionResult> PhotoUpload(IFormFile formFile)
         {
@@ -145,7 +118,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpGet("file")]
         public async Task<IActionResult> FileDownload([FromQuery] string fileName)
         {
@@ -153,36 +126,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return File(result.Item1, result.Item2, result.Item3);
         }
 
-        //[HttpPut]
-        //public async Task<IActionResult> UpdateProjectOwner([FromBody] ProjectOwnerDTO projectOwnerDTO, CancellationToken token)
-        //{
-        //    var projectOwnerToUpdate = await _projectOwnerService.GetProjectOwnerByEmail(projectOwnerDTO.Email, token);
-
-        //    if (projectOwnerToUpdate == null)
-        //    {
-        //        throw new CustomApiException()
-        //        {
-        //            StatusCode = StatusCodes.Status404NotFound,
-        //            Title = "User not found",
-        //            Detail = "User with such id not found"
-        //        };
-        //    }
-
-        //    if (await _projectOwnerService.UpdateProjectOwner(projectOwnerDTO))
-        //    {
-        //        return StatusCode(StatusCodes.Status200OK, "User succesfully updated");
-        //    }
-        //    else
-        //    {
-        //        throw new CustomApiException()
-        //        {
-        //            StatusCode = StatusCodes.Status500InternalServerError,
-        //            Title = "Server Error",
-        //            Detail = "Error occured while server running"
-        //        };
-        //    }
-        //}
-
+        [Authorize(Policy = "AdminRole")]
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> DeleteProjectOwner([FromRoute] Guid id, CancellationToken token)
         {
@@ -214,6 +158,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
+        [Authorize(Policy = "AdminRole")]
         [HttpGet("projectOwners")]
         public async Task<IActionResult> GetAllProjectOwners([FromQuery] PaginationFilter paginationFilter, CancellationToken token)
         {

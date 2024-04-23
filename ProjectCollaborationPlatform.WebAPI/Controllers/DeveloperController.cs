@@ -23,7 +23,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _developerService = developerService;
         }
 
-        [Authorize]
+        [Authorize(Policy = "DeveloperRole")]
         [HttpPost]
         public async Task<IActionResult> CreateDeveloper(CreateDeveloperDTO developerDTO, CancellationToken token)
         {
@@ -75,37 +75,6 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 };
             }
         }
-
-        //[Authorize]
-        //[HttpGet("{email}")]
-        //public async Task<IActionResult> GetDeveloperByEmail([FromRoute] string email, CancellationToken token)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    var usr = await _developerService.GetDeveloperByEmail(email, token);
-
-        //    if (usr != null)
-        //    {
-        //        return Ok(new
-        //        {
-        //            message = "User found"
-        //        });
-        //    }
-        //    else
-        //    {
-        //        throw new CustomApiException()
-        //        {
-        //            StatusCode = StatusCodes.Status404NotFound,
-        //            Title = "Not found",
-        //            Detail = "User not found"
-        //        };
-        //    }
-
-        //}
-
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetDeveloperById(CancellationToken token)
@@ -212,6 +181,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         //    }
         //}
 
+        [Authorize(Policy = "AdminRole")]
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> DeleteDeveloper([FromRoute] Guid id, CancellationToken token)
         {
@@ -243,6 +213,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("developers")]
         public async Task<IActionResult> GetAllDevelopers([FromQuery] PaginationFilter paginationFilter, CancellationToken token)
         {

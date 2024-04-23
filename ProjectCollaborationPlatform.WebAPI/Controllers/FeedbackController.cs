@@ -23,6 +23,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpPost("{devId:Guid}")]
         public async Task<IActionResult> AddFeedback([FromRoute] Guid devId, [FromBody] FeedbackDTO feedbackDTO)
         {
@@ -54,6 +55,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> DeleteFeedback([FromRoute] Guid id, CancellationToken token)
         {
@@ -74,6 +76,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
 
         [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpPatch("{id:Guid}")]
         public async Task<IActionResult> UpdateFeedback([FromRoute] Guid id, [FromBody] FeedbackDTO feedbackDTO)
         {
@@ -92,7 +95,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "AdminProjectOwnerRole")]
         [HttpGet("{devId:Guid}")]
         public async Task<IActionResult> GetAllDeveloperFeedbacks([FromQuery] PaginationFilter paginationFilter, [FromRoute] Guid devId, CancellationToken token)
         {
@@ -103,6 +106,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [Authorize]
+        [Authorize(Policy = "DeveloperRole")]
         [HttpGet]
         public async Task<IActionResult> GetAllFeedbacksForCurrentDev([FromQuery] PaginationFilter paginationFilter, CancellationToken token)
         {
@@ -115,6 +119,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpGet("feedbacks")]
+        [Authorize(Policy = "AdminRole")]
         public async Task<IActionResult> GetAllFeedbacks([FromQuery] PaginationFilter paginationFilter, CancellationToken token)
         {
             var filter = new PaginationFilter(paginationFilter.PageNumber, paginationFilter.PageSize);

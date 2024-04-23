@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
@@ -8,6 +9,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
 
     [Route("api/[controller]")]
+    [Authorize(Policy = "ProjectOwner")]
     [ApiController]
     public class BoardController : ControllerBase
     {

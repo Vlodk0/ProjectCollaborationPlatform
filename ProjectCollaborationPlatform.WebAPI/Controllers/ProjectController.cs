@@ -26,7 +26,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _developerService = developerService;
         }
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole, DeveloperRole, AdminRole")]
         [HttpGet("{name}")]
         public async Task<IActionResult> GetProjectByName([FromRoute] string name, CancellationToken token)
         {
@@ -60,6 +60,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return Ok(project);
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllProjects([FromQuery] int pageNumber, [FromQuery] int pageSize,
             [FromQuery] string sortColumn, [FromQuery] string sortDirection, CancellationToken token)
@@ -70,6 +71,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return Ok(projects);
         }
 
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpGet("my-projects")]
         public async Task<IActionResult> GetAllProjectsByProjectOwnerId([FromQuery] int pageNumber, [FromQuery] int pageSize,
     [FromQuery] string sortColumn, [FromQuery] string sortDirection, CancellationToken token)
@@ -82,6 +84,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return Ok(projects);
         }
 
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpGet("projectOwner/projects")]
         public async Task<IActionResult> GetProjectOwnerProjects(CancellationToken token)
         {
@@ -101,7 +104,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpPost]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectDTO project, CancellationToken token)
         {
@@ -144,7 +147,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpPut("{id:Guid}")]
         public async Task<IActionResult> UpdateProject([FromBody] CreateProjectDTO projectDTO, [FromRoute] Guid id, CancellationToken token)
         {
@@ -176,7 +179,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpPut("ProjectDetails/{id:Guid}")]
         public async Task<IActionResult> UpdateProjectDetails([FromBody] ProjectDetailDTO projectDetailDTO, [FromRoute] Guid id, CancellationToken token)
         {
@@ -196,7 +199,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "AdminRole")]
         [HttpDelete("{id:Guid}")]
         public async Task<ActionResult<Project>> DeleteProjectById([FromRoute] Guid id, CancellationToken token)
         {
@@ -227,7 +230,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpPost("technologies/{id:Guid}")]
         public async Task<IActionResult> AddTechnologyToProject([FromRoute] Guid id, List<string> techId)
         {
@@ -253,7 +256,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        //[Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpPost("developers/{id:Guid}")]
         public async Task<IActionResult> AddDevelopersToProject([FromRoute] Guid id, [FromBody] List<Guid> developerId)
         {
@@ -279,7 +282,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpDelete("technologies/{id:Guid}")]
         public async Task<IActionResult> RemoveTechnologiesFromProject([FromRoute] Guid id, List<string> techId)
         {
@@ -305,7 +308,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "ProjectOwnerRole")]
         [HttpDelete("developers/{id:Guid}")]
         public async Task<IActionResult> RemoveDevelopersFromProject([FromRoute] Guid id, List<Guid> developerId)
         {
