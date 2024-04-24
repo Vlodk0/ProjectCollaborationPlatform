@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ProjectCollaborationPlatform.DAL.Data.Models;
+using ProjectCollaborationPlatform.DAL.Models;
 
 
 namespace ProjectCollaborationPlatform.DAL.Data.DataAccess.Configurations
@@ -15,6 +16,12 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
             builder
                 .HasKey(p => p.Id);
+
+            builder
+                .HasOne(b => b.PhotoFile)
+                .WithOne(p => p.ProjectOwner)
+                .HasForeignKey<ProjectOwner>(pr => pr.PhotoFileId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

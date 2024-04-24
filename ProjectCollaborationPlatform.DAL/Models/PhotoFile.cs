@@ -12,8 +12,6 @@ namespace ProjectCollaborationPlatform.DAL.Models
         public string Path {  get; set; }
         public string Name {  get; set; }
         public Developer Developer { get; set; }
-        public Guid? DeveloperId { get; set; }
         public ProjectOwner ProjectOwner { get; set; }
-        public Guid? ProjectOwnerId { get; set; }
     }
 }

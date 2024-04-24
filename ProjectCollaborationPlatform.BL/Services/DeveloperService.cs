@@ -207,5 +207,42 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             return await SaveDeveloperAsync();
         }
+
+        public async Task<UserInfoWithAvatarDTO> GetDeveloperWithAvatar(Guid id, CancellationToken token)
+        {
+            var dev = await _context.Developers
+                .Include(p => p.PhotoFile)
+                .Where(i => i.Id == id).FirstOrDefaultAsync(token);
+
+            if (dev == null)
+            {
+                return null;
+            }
+
+            var getDev = new UserInfoWithAvatarDTO()
+            {
+                Id = dev.Id,
+                Email = dev.Email,
+                FirstName = dev.FirstName,
+                LastName = dev.LastName,
+                RoleName = "Dev",
+                IsDeleted = dev.IsDeleted,
+                AvatarName = dev.PhotoFile.Name
+            };
+
+            if (getDev.IsDeleted)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Title = "Access forbidden",
+                    Detail = "Your accound was deleted by admin"
+                };
+            }
+            else
+            {
+                return getDev;
+            }
+        }
     }
 }

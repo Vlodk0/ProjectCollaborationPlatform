@@ -6,6 +6,7 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
     public interface IDeveloperService
     {
         Task<DeveloperDTO> GetDeveloperById(Guid id, CancellationToken token);
+        Task<UserInfoWithAvatarDTO> GetDeveloperWithAvatar(Guid id, CancellationToken token);
         Task<bool> AddDeveloper(Guid id, DeveloperDTO developer);
         Task<bool> UpdateDeveloper(Guid id, UpdateUserDTO userDTO);
         Task<bool> DeleteDeveloper(Guid id);

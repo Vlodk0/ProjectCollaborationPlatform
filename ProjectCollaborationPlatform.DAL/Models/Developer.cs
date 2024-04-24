@@ -10,7 +10,8 @@ namespace ProjectCollaborationPlatform.DAL.Data.Models
         public string LastName {  get; set; }
         public bool IsDeleted { get; set; }
         public string Email {  get; set; }
-        public PhotoFile PhotoFile { get; set; }
+        public PhotoFile? PhotoFile { get; set; }
+        public Guid? PhotoFileId { get; set; }
         public List<DeveloperTechnology> DeveloperTechnologies {  get; set; }
         public List<ProjectDeveloper> ProjectDevelopers { get; set; }
         public List<Feedback> Feedbacks { get; set; }

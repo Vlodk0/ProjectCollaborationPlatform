@@ -101,9 +101,64 @@ namespace ProjectCollaborationPlatform.BL.Services
                 Email = projectOwner.Email,
                 FirstName = projectOwner.FirstName,
                 LastName = projectOwner.LastName,
-                RoleName = "ProjectOwner",
+                RoleName = roleName,
                 IsDeleted = projectOwner.IsDeleted,
             };
+
+            if (getProjectOwner.IsDeleted)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Title = "Access forbidden",
+                    Detail = "Your accound was deleted by admin"
+                };
+            }
+            else
+            {
+                return getProjectOwner;
+            }
+        }
+
+        public async Task<UserInfoWithAvatarDTO> GetProjectOwnerWithAvatar(Guid id, CancellationToken token)
+        {
+            var projOwner = await _context.ProjectOwners
+               .Include(p => p.PhotoFile)
+               .Where(i => i.Id == id).FirstOrDefaultAsync(token);
+
+            if (projOwner == null)
+            {
+                return null;
+            }
+
+            string roleName = (id == Guid.Parse("69f30183-6c5d-4b6b-163d-08dc62e06e37"))
+               ? "Admin"
+               : "ProjectOwner";
+
+            var getProjOwner = new UserInfoWithAvatarDTO()
+            {
+                Id = projOwner.Id,
+                Email = projOwner.Email,
+                FirstName = projOwner.FirstName,
+                LastName = projOwner.LastName,
+                RoleName = roleName,
+                IsDeleted = projOwner.IsDeleted,
+                AvatarName = projOwner.PhotoFile.Name
+            };
+
+            if (getProjOwner.IsDeleted)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Title = "Access forbidden",
+                    Detail = "Your accound was deleted by admin"
+                };
+            }
+            else
+            {
+                return getProjOwner;
+            }
         }
 
         public Task<bool> IsProjectOwnerExists(string email)
