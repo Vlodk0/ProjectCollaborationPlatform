@@ -11,7 +11,9 @@ namespace ProjectCollaborationPlatform.BL.Interfaces
         public Task<bool> RemoveTechnologyFromProject(Guid Id, List<string> techId);
         public Task<bool> RemoveTechnologyFromDeveloper(Guid Id, List<string> techId);
         public Task<List<TechnologyDTO>> GetAllTechnologies(CancellationToken token);
+        public Task<List<TechnologyDTO>> GetAllDeveloperTechnologies(Guid devId, CancellationToken token);
         public Task<List<TechnologyDTO>> GetAllTechnologiesByProjectId(Guid projId, CancellationToken token);
+        public Task<List<CountTechnologyOnProjectsDTO>> GetTechnologyStatisticByProjects(CancellationToken token);
         public Task<bool> SaveTechnologiesAsync();
     }
 }

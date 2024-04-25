@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
+using ProjectCollaborationPlatform.BL.Services;
+using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
@@ -50,6 +52,26 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 };
             }
             return Ok(technologies);
+        }
+
+        [Authorize]
+        [HttpGet("statistic")]
+        public async Task<ActionResult<List<CountTechnologyOnProjectsDTO>>> GetTechnologyStatisticByProjects(CancellationToken token)
+        {
+            try
+            {
+                var technologyStats = await _technologyService.GetTechnologyStatisticByProjects(token);
+                return Ok(technologyStats);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Title = "Server Error",
+                    Detail = "Error occured while server running"
+                };
+            }
         }
     }
 }

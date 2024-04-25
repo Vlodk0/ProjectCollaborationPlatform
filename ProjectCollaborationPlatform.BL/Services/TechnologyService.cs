@@ -202,5 +202,43 @@ namespace ProjectCollaborationPlatform.BL.Services
 
             return technologies;
         }
+
+        public async Task<List<TechnologyDTO>> GetAllDeveloperTechnologies(Guid devId, CancellationToken token)
+        {
+            var technologies = await _context.Developers
+                            .Where(p => p.Id == devId)
+                            .SelectMany(p => p.DeveloperTechnologies.Select(pt => pt.Technology))
+                            .Select(t => new TechnologyDTO
+                            {
+                                Id = t.Id,
+                                Framework = t.Framework,
+                                Technology = t.Language
+                            })
+                            .ToListAsync(token);
+
+            return technologies;
+        }
+
+        public async Task<List<CountTechnologyOnProjectsDTO>> GetTechnologyStatisticByProjects(CancellationToken token)
+        {
+            var projectsWithTechnologies = await _context.Projects
+                .Include(p => p.ProjectTechnologies)
+                .ThenInclude(pt => pt.Technology)
+                .ToListAsync(token);
+
+            var technologyStats = projectsWithTechnologies
+                .SelectMany(p => p.ProjectTechnologies.Select(pt => new { ProjectId = p.Id, Technology = pt.Technology }))
+                .GroupBy(pt => pt.Technology.Language)
+                .Select(group => new CountTechnologyOnProjectsDTO
+                {
+                    Technology = group.First().Technology.Language,
+                    Count = group.Count()
+                })
+                .ToList();
+
+            return technologyStats;
+
+
+        }
     }
 }
