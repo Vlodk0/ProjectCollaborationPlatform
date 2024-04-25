@@ -75,5 +75,46 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 };
             }
         }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetAllDeveloperTechnologies(CancellationToken token)
+        {
+            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+
+            var technologies = await _technologyService.GetAllDeveloperTechnologies(id, token);
+
+            if (technologies == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Technologies not found",
+                    Detail = "Technologies with such id doesn't exist"
+                };
+            }
+            return Ok(technologies);
+        }
+
+        [Authorize(Policy = "DevProjectOwnerRole")]
+        [HttpGet("dev/{id:Guid}")]
+        public async Task<IActionResult> GetAllDeveloperTechnologies([FromRoute] Guid id, CancellationToken token)
+        {
+
+            var technologies = await _technologyService.GetAllDeveloperTechnologies(id, token);
+
+            if (technologies == null)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Technologies not found",
+                    Detail = "Technologies with such id doesn't exist"
+                };
+            }
+            return Ok(technologies);
+        }
+
     }
 }

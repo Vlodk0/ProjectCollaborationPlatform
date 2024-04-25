@@ -114,7 +114,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             if(await _functionalityBlockService.DeleteFunctionalityBlock(id))
             {
-                return Ok("FunctionalityBlock deleted successfully");
+                return NoContent();
             }
             else
             {

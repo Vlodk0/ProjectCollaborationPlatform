@@ -120,67 +120,6 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         }
 
-        [Authorize]
-        [HttpPost("photo")]
-        public async Task<IActionResult> PhotoUpload(IFormFile formFile)
-        {
-            Guid userParseId;
-            try
-            {
-                userParseId = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            }
-            catch (Exception)
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status422UnprocessableEntity,
-                    Title = "Something wrong with user Guid",
-                    Detail = "Error occured while parsing guid from user claims"
-                };
-            }
-            var result = await _photoService.UploadFile(formFile, userParseId);
-
-            return Ok(result);
-        }
-
-        [Authorize]
-        [HttpGet("file")]
-        public async Task<IActionResult> FileDownload([FromQuery] string fileName)
-        {
-            var result = await _photoService.DownloadFile(fileName);
-            return File(result.Item1, result.Item2, result.Item3);
-        }
-
-        //[HttpPut]
-        //public async Task<IActionResult> UpdateDeveloper([FromBody] DeveloperDTO developerDTO, CancellationToken token)
-        //{
-        //    var userToUpdate = await _developerService.GetDeveloperById(developerDTO.Id, token);
-
-        //    if (userToUpdate == null)
-        //    {
-        //        throw new CustomApiException()
-        //        {
-        //            StatusCode = StatusCodes.Status404NotFound,
-        //            Title = "User not found",
-        //            Detail = "User with such id not found"
-        //        };
-        //    }
-
-        //    if (await _developerService.UpdateDeveloper(developerDTO))
-        //    {
-        //        return StatusCode(StatusCodes.Status200OK, "User succesfully updated");
-        //    }
-        //    else
-        //    {
-        //        throw new CustomApiException()
-        //        {
-        //            StatusCode = StatusCodes.Status500InternalServerError,
-        //            Title = "Server Error",
-        //            Detail = "Error occured while server running"
-        //        };
-        //    }
-        //}
-
         [Authorize(Policy = "AdminRole")]
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> DeleteDeveloper([FromRoute] Guid id, CancellationToken token)
@@ -200,7 +139,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             if (await _developerService.DeleteDeveloper(id))
             {
-                return StatusCode(StatusCodes.Status200OK, "User succesfully deleted");
+                return NoContent();
             }
             else
             {

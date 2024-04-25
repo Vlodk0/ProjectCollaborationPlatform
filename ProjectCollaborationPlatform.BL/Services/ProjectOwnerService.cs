@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.BL.Interfaces;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess;
 using ProjectCollaborationPlatform.DAL.Data.Models;
 using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.Helpers;
 using ProjectCollaborationPlatform.Domain.Pagination;
 
 namespace ProjectCollaborationPlatform.BL.Services
@@ -36,16 +38,10 @@ namespace ProjectCollaborationPlatform.BL.Services
             {
                 return false;
             }
-            var deletedProjectOwner = new ProjectOwner()
-            {
-                FirstName = projectOwner.FirstName,
-                LastName = projectOwner.LastName,
-                Email = projectOwner.Email,
-                IsDeleted = true,
-            };
 
-            _context.ProjectOwners.Remove(projectOwner);
-            _context.ProjectOwners.Update(deletedProjectOwner);
+            projectOwner.IsDeleted = true;
+
+            _context.ProjectOwners.Update(projectOwner);
 
             return await SaveProjectOwnerAsync();
         }
@@ -95,7 +91,11 @@ namespace ProjectCollaborationPlatform.BL.Services
                 return null;
             }
 
-            return new ProjectOwnerDTO()
+            string roleName = (id == Guid.Parse("69f30183-6c5d-4b6b-163d-08dc62e06e37"))
+               ? "Admin"
+               : "ProjectOwner";
+
+            var getProjectOwner = new ProjectOwnerDTO()
             {
                 Id = id,
                 Email = projectOwner.Email,
@@ -135,6 +135,9 @@ namespace ProjectCollaborationPlatform.BL.Services
                ? "Admin"
                : "ProjectOwner";
 
+
+            string fileName = projOwner.PhotoFileId == null ?  "default" :  projOwner.PhotoFile.Name;
+
             var getProjOwner = new UserInfoWithAvatarDTO()
             {
                 Id = projOwner.Id,
@@ -143,7 +146,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                 LastName = projOwner.LastName,
                 RoleName = roleName,
                 IsDeleted = projOwner.IsDeleted,
-                AvatarName = projOwner.PhotoFile.Name
+                AvatarName = fileName,
             };
 
             if (getProjOwner.IsDeleted)

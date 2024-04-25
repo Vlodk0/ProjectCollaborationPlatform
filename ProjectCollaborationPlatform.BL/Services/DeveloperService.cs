@@ -20,6 +20,18 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<bool> AddDeveloper(Guid id, DeveloperDTO developerDTO)
         {
+            var user = await _context.Developers.Where(i => i.Id == id).FirstOrDefaultAsync();
+  
+            if (user != null && user.IsDeleted)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Title = "Access forbidden",
+                    Detail = "Your accound was deleted by admin"
+                };
+            }
+
             var dev = new Developer()
             {
                 Id = id,
@@ -39,31 +51,13 @@ namespace ProjectCollaborationPlatform.BL.Services
             {
                 return false;
             }
-            var deletedDev = new Developer()
-            {
-                FirstName = dev.FirstName,
-                LastName = dev.LastName,
-                Email = dev.Email,
-                IsDeleted = true,
-            };
 
-            _context.Developers.Update(deletedDev);
+            dev.IsDeleted = true;
+
+            _context.Developers.Update(dev);
 
             return await SaveDeveloperAsync();
         }
-
-        //public async Task<DeveloperDTO> GetDeveloperByEmail(string email, CancellationToken token)
-        //{
-        //    var dev = await _context.Developers.Where(e => e.Email == email).FirstOrDefaultAsync(token);
-
-        //    return new DeveloperDTO()
-        //    {
-        //        Id = dev.Id,
-        //        Email = dev.Email,
-        //        FirstName = dev.FirstName,
-        //        LastName = dev.LastName,
-        //    };
-        //}
 
         public async Task<DeveloperDTO> GetDeveloperById(Guid id, CancellationToken token)
         {
@@ -74,7 +68,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                 return null;
             }
 
-            return new DeveloperDTO()
+            var getDev =  new DeveloperDTO()
             {
                 Id = dev.Id,
                 Email = dev.Email,
@@ -84,11 +78,26 @@ namespace ProjectCollaborationPlatform.BL.Services
                 IsDeleted = dev.IsDeleted
             };
 
+            if(getDev.IsDeleted)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Title = "Access forbidden",
+                    Detail = "Your accound was deleted by admin"
+                };
+            }
+            else
+            {
+                return getDev;
+            }
+
         }
 
         public async Task<PagedResponse<List<PaginationDeveloperDTO>>> GetAllDevelopers(PaginationFilter filter, CancellationToken token)
         {
-            IQueryable<Developer> query = _context.Developers;
+            IQueryable<Developer> query = _context.Developers
+                .Where(i => i.IsDeleted == false);
 
             var totalRecords = await query.CountAsync(token);
             var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
@@ -219,6 +228,8 @@ namespace ProjectCollaborationPlatform.BL.Services
                 return null;
             }
 
+            string fileName = dev.PhotoFileId == null ? "default" : dev.PhotoFile.Name;
+
             var getDev = new UserInfoWithAvatarDTO()
             {
                 Id = dev.Id,
@@ -227,7 +238,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                 LastName = dev.LastName,
                 RoleName = "Dev",
                 IsDeleted = dev.IsDeleted,
-                AvatarName = dev.PhotoFile.Name
+                AvatarName = fileName
             };
 
             if (getDev.IsDeleted)

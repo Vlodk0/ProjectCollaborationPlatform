@@ -72,7 +72,8 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
         }
 
-        [Authorize(Policy = "ProjectOwnerRole")]
+        //[Authorize(Policy = "ProjectOwnerRole")]
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetProjectOwnerById(CancellationToken token)
         {
@@ -94,38 +95,6 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         }
 
-        [Authorize(Policy = "ProjectOwnerRole")]
-        [HttpPost("photo")]
-        public async Task<IActionResult> PhotoUpload(IFormFile formFile)
-        {
-            Guid userParseId;
-            try
-            {
-                userParseId = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            }
-            catch (Exception)
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status422UnprocessableEntity,
-                    Title = "Something wrong with user Guid",
-                    Detail = "Error occured while parsing guid from user claims"
-                };
-            }
-            var result = await _photoService.UploadFile(formFile, userParseId);
-
-            return Ok(result);
-        }
-
-
-        [Authorize(Policy = "ProjectOwnerRole")]
-        [HttpGet("file")]
-        public async Task<IActionResult> FileDownload([FromQuery] string fileName)
-        {
-            var result = await _photoService.DownloadFile(fileName);
-            return File(result.Item1, result.Item2, result.Item3);
-        }
-
         [Authorize(Policy = "AdminRole")]
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> DeleteProjectOwner([FromRoute] Guid id, CancellationToken token)
@@ -145,7 +114,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             if (await _projectOwnerService.DeleteProjectOwner(id))
             {
-                return StatusCode(StatusCodes.Status200OK, "User succesfully deleted");
+                return NoContent();
             }
             else
             {

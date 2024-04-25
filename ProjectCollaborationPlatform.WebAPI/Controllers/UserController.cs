@@ -15,13 +15,15 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         private readonly IDeveloperService _developerService;
         private readonly IProjectOwnerService _projectOwnerService;
         private readonly IProjectService _projectService;
+        private readonly IPhotoManageService _photoService;
 
 
-        public UserController(IDeveloperService developerService, IProjectOwnerService projectOwnerService, IProjectService projectService)
+        public UserController(IDeveloperService developerService, IProjectOwnerService projectOwnerService, IProjectService projectService, IPhotoManageService photoService)
         {
             _developerService = developerService;
             _projectOwnerService = projectOwnerService;
             _projectService = projectService;
+            _photoService = photoService;
         }
 
 
@@ -64,9 +66,126 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     };
                 }
             }
-            else if (roleName == "ProjectOwner")
+            else if (roleName == "ProjectOwner" || roleName == "Admin")
             {
                 var projOwner = await _projectOwnerService.GetProjectOwnerById(id, token);
+                if (projOwner != null)
+                {
+                    return Ok(projOwner);
+                }
+                else
+                {
+                    throw new CustomApiException()
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Title = "Not found",
+                        Detail = "Project Owner with such id is not found"
+                    };
+                }
+            }
+            return BadRequest();
+        }
+
+        [Authorize]
+        [HttpGet("currentUser")]
+        public async Task<IActionResult> IsUserExists(CancellationToken token)
+        {
+            Guid id;
+            String roleName;
+            try
+            {
+                id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+                roleName = HttpContext.User.FindFirstValue(ClaimTypes.Role);
+            }
+            catch (Exception)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status422UnprocessableEntity,
+                    Title = "Error parsing claims",
+                    Detail = "Error occured while parsing claims on server"
+                };
+            }
+
+            if (roleName == "Dev")
+            {
+                var dev = await _developerService.GetDeveloperById(id, token);
+                if (dev != null)
+                {
+                    return Ok(dev);
+                }
+                else
+                {
+                    throw new CustomApiException()
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Title = "Dev not found",
+                        Detail = "Dev with such id is not found"
+                    };
+                }
+            }
+            else if (roleName == "ProjectOwner" || roleName == "Admin")
+            {
+                var projOwner = await _projectOwnerService.GetProjectOwnerById(id, token);
+                if (projOwner != null)
+                {
+                    return Ok(projOwner);
+                }
+                else
+                {
+                    throw new CustomApiException()
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Title = "Project Owner not found",
+                        Detail = "Project Owner with such id is not found"
+                    };
+                }
+            }
+            return BadRequest();
+        }
+
+
+        [Authorize]
+        [HttpGet("user")]
+        public async Task<IActionResult> GetByIdWithAvatar(CancellationToken token)
+        {
+            Guid id;
+            String roleName;
+            try
+            {
+                id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+                roleName = HttpContext.User.FindFirstValue(ClaimTypes.Role);
+            }
+            catch (Exception)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status422UnprocessableEntity,
+                    Title = "Error parsing claims",
+                    Detail = "Error occured while parsing claims on server"
+                };
+            }
+
+            if (roleName == "Dev")
+            {
+                var dev = await _developerService.GetDeveloperWithAvatar(id, token);
+                if (dev != null)
+                {
+                    return Ok(dev);
+                }
+                else
+                {
+                    throw new CustomApiException()
+                    {
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Title = "Not found",
+                        Detail = "Dev with such id is not found"
+                    };
+                }
+            }
+            else if (roleName == "ProjectOwner" || roleName == "Admin")
+            {
+                var projOwner = await _projectOwnerService.GetProjectOwnerWithAvatar(id, token);
                 if (projOwner != null)
                 {
                     return Ok(projOwner);
@@ -110,7 +229,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 var dev = await _developerService.UpdateDeveloper(id, userDTO);
                 if (dev)
                 {
-                    return Ok(dev);
+                    return NoContent();
                 }
                 else
                 {
@@ -127,7 +246,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 var projOwner = await _projectOwnerService.UpdateProjectOwner(id, userDTO);
                 if (projOwner)
                 {
-                    return Ok(projOwner);
+                    return NoContent();
                 }
                 else
                 {
@@ -201,6 +320,37 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 }
             }
             return BadRequest();
+        }
+
+        [Authorize]
+        [HttpPost("photo")]
+        public async Task<IActionResult> PhotoUpload(IFormFile file)
+        {
+            Guid userParseId;
+            try
+            {
+                userParseId = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            }
+            catch (Exception)
+            {
+                throw new CustomApiException()
+                {
+                    StatusCode = StatusCodes.Status422UnprocessableEntity,
+                    Title = "Something wrong with user Guid",
+                    Detail = "Error occured while parsing guid from user claims"
+                };
+            }
+
+            var result = await _photoService.UploadFile(file, userParseId);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet("{fileName}")]
+        public async Task<IActionResult> FileDownload([FromRoute] string fileName)
+        {
+            var result = await _photoService.DownloadFile(fileName);
+            return File(result.Item1, result.Item2, result.Item3);
         }
     }
 }
