@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectCollaborationPlatform.DAL.Data.DataAccess.Configurations;
 using ProjectCollaborationPlatform.DAL.Data.Models;
+using ProjectCollaborationPlatform.DAL.DataAccess.Configurations;
+using ProjectCollaborationPlatform.DAL.Models;
 
 namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
 {
@@ -14,11 +16,10 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
         public DbSet<ProjectDetail> ProjectDetails { get; set; }
         public DbSet<ProjectDeveloper> ProjectDevelopers { get; set; }
         public DbSet<ProjectTechnology> ProjectTechnologies { get; set; }
-        public DbSet<Models.Task> Tasks { get; set; }
-        public DbSet<Team> Teams { get; set; }
-        public DbSet<TeamDeveloper> TeamDevelopers { get; set; }
         public DbSet<Technology> Technologies { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<PhotoFile> PhotoFiles { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<ProjectOwner> ProjectOwners { get; set; }
 
         public ProjectPlatformContext()
         {
@@ -30,11 +31,6 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
             
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Server=localhost;Database=ProjectCollaborationPlatformDB;Trusted_Connection=True;");
-            base.OnConfiguring(optionsBuilder);
-        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -45,7 +41,10 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess
             builder.ApplyConfiguration(new ProjectDetailConfiguration()); 
             builder.ApplyConfiguration(new ProjectDeveloperConfiguration()); 
             builder.ApplyConfiguration(new ProjectTechnologyConfiguration()); 
-            builder.ApplyConfiguration(new TeamDeveloperConfiguration()); 
+            builder.ApplyConfiguration(new PhotoFileConfiguration()); 
+            builder.ApplyConfiguration(new DeveloperConfiguration());
+            builder.ApplyConfiguration(new ProjectOwnerConfiguration());
+            builder.ApplyConfiguration(new FeedbackConfiguration());
             base.OnModelCreating(builder);
         }
 

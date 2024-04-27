@@ -6,8 +6,8 @@ namespace ProjectCollaborationPlatform.DAL.Data.Models
     {
         public string Title { get; set; }
         public int Payment {  get; set; }
+        public string ShortInfo {  get; set; }
         public Board Board { get; set; }
-        public Guid ProjectDetailID {  get; set; }
         public ProjectDetail ProjectDetail {  get; set; }
         public List<ProjectDeveloper> ProjectDevelopers { get; set; }
         public List<ProjectTechnology> ProjectTechnologies { get; set; }

@@ -22,11 +22,15 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Board", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Board", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ProjectID")
                         .HasColumnType("uniqueidentifier");
@@ -39,18 +43,40 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.ToTable("Boards");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Developer", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Developer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("PhotoFileId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PhotoFileId")
+                        .IsUnique()
+                        .HasFilter("[PhotoFileId] IS NOT NULL");
 
                     b.ToTable("Developers");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.DeveloperTechnology", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.DeveloperTechnology", b =>
                 {
                     b.Property<Guid>("DeveloperID")
                         .HasColumnType("uniqueidentifier");
@@ -65,7 +91,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.ToTable("DeveloperTechnologies");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.FunctionalityBlock", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.FunctionalityBlock", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -74,7 +100,10 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.Property<Guid>("BoardID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Name")
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Task")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -85,7 +114,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.ToTable("FunctionalityBlocks");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Project", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -94,11 +123,12 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.Property<int>("Payment")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("ProjectDetailID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("ProjectOwnerID")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ShortInfo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -106,15 +136,12 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectDetailID")
-                        .IsUnique();
-
                     b.HasIndex("ProjectOwnerID");
 
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.ProjectDetail", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectDetail", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,10 +156,13 @@ namespace ProjectCollaborationPlatform.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProjectID")
+                        .IsUnique();
+
                     b.ToTable("ProjectDetails");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.ProjectDeveloper", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectDeveloper", b =>
                 {
                     b.Property<Guid>("ProjectID")
                         .HasColumnType("uniqueidentifier");
@@ -147,18 +177,40 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.ToTable("ProjectDevelopers");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.ProjectOwner", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectOwner", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("PhotoFileId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.ToTable("ProjectOwner");
+                    b.HasIndex("PhotoFileId")
+                        .IsUnique()
+                        .HasFilter("[PhotoFileId] IS NOT NULL");
+
+                    b.ToTable("ProjectOwners");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.ProjectTechnology", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectTechnology", b =>
                 {
                     b.Property<Guid>("ProjectID")
                         .HasColumnType("uniqueidentifier");
@@ -173,59 +225,7 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.ToTable("ProjectTechnologies");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Task", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Descripion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("FunctionalityBlockID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FunctionalityBlockID");
-
-                    b.ToTable("Tasks");
-                });
-
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Team", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Members")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Teams");
-                });
-
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.TeamDeveloper", b =>
-                {
-                    b.Property<Guid>("DeveloperID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("TeamID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("DeveloperID", "TeamID");
-
-                    b.HasIndex("TeamID");
-
-                    b.ToTable("TeamDevelopers");
-                });
-
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Technology", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Technology", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -244,63 +244,80 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.ToTable("Technologies");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.User", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Models.Feedback", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<Guid>("DeveloperId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProjectOwnerID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeveloperId");
+
+                    b.HasIndex("ProjectOwnerID");
+
+                    b.ToTable("Feedbacks");
+                });
+
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Models.PhotoFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("RoleID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("RoleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Surname")
+                    b.Property<string>("Path")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("PhotoFiles");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Board", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Board", b =>
                 {
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Project", "Project")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Project", "Project")
                         .WithOne("Board")
-                        .HasForeignKey("ProjectCollaborationPlatform.Data.Models.Board", "ProjectID")
+                        .HasForeignKey("ProjectCollaborationPlatform.DAL.Data.Models.Board", "ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.DeveloperTechnology", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Developer", b =>
                 {
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Developer", "Developer")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Models.PhotoFile", "PhotoFile")
+                        .WithOne("Developer")
+                        .HasForeignKey("ProjectCollaborationPlatform.DAL.Data.Models.Developer", "PhotoFileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("PhotoFile");
+                });
+
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.DeveloperTechnology", b =>
+                {
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Developer", "Developer")
                         .WithMany("DeveloperTechnologies")
                         .HasForeignKey("DeveloperID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Technology", "Technology")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Technology", "Technology")
                         .WithMany("DeveloperTechnologies")
                         .HasForeignKey("TechnologyID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -311,9 +328,9 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.Navigation("Technology");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.FunctionalityBlock", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.FunctionalityBlock", b =>
                 {
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Board", "Board")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Board", "Board")
                         .WithMany("FunctionalityBlocksID")
                         .HasForeignKey("BoardID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -322,34 +339,37 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.Navigation("Board");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Project", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Project", b =>
                 {
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.ProjectDetail", "ProjectDetail")
-                        .WithOne("Project")
-                        .HasForeignKey("ProjectCollaborationPlatform.Data.Models.Project", "ProjectDetailID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.ProjectOwner", "ProjectOwner")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.ProjectOwner", "ProjectOwner")
                         .WithMany("Projects")
                         .HasForeignKey("ProjectOwnerID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("ProjectDetail");
 
                     b.Navigation("ProjectOwner");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.ProjectDeveloper", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectDetail", b =>
                 {
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Developer", "Developer")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Project", "Project")
+                        .WithOne("ProjectDetail")
+                        .HasForeignKey("ProjectCollaborationPlatform.DAL.Data.Models.ProjectDetail", "ProjectID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectDeveloper", b =>
+                {
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Developer", "Developer")
                         .WithMany("ProjectDevelopers")
                         .HasForeignKey("DeveloperID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Project", "Project")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Project", "Project")
                         .WithMany("ProjectDevelopers")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -360,15 +380,25 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.Navigation("Project");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.ProjectTechnology", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectOwner", b =>
                 {
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Project", "Project")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Models.PhotoFile", "PhotoFile")
+                        .WithOne("ProjectOwner")
+                        .HasForeignKey("ProjectCollaborationPlatform.DAL.Data.Models.ProjectOwner", "PhotoFileId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("PhotoFile");
+                });
+
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectTechnology", b =>
+                {
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Project", "Project")
                         .WithMany("ProjectTechnologies")
                         .HasForeignKey("ProjectID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Technology", "Technology")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Technology", "Technology")
                         .WithMany("ProjectTechnologies")
                         .HasForeignKey("TechnologyID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -379,86 +409,73 @@ namespace ProjectCollaborationPlatform.Data.Migrations
                     b.Navigation("Technology");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Task", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Models.Feedback", b =>
                 {
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.FunctionalityBlock", "FunctionalityBlock")
-                        .WithMany("Tasks")
-                        .HasForeignKey("FunctionalityBlockID")
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.Developer", "Developer")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("DeveloperId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FunctionalityBlock");
-                });
-
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.TeamDeveloper", b =>
-                {
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Developer", "Developer")
-                        .WithMany("TeamDevelopers")
-                        .HasForeignKey("DeveloperID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjectCollaborationPlatform.Data.Models.Team", "Team")
-                        .WithMany("TeamDevelopers")
-                        .HasForeignKey("TeamID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("ProjectCollaborationPlatform.DAL.Data.Models.ProjectOwner", "ProjectOwner")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("ProjectOwnerID")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Developer");
 
-                    b.Navigation("Team");
+                    b.Navigation("ProjectOwner");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Board", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Board", b =>
                 {
                     b.Navigation("FunctionalityBlocksID");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Developer", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Developer", b =>
                 {
                     b.Navigation("DeveloperTechnologies");
 
+                    b.Navigation("Feedbacks");
+
                     b.Navigation("ProjectDevelopers");
-
-                    b.Navigation("TeamDevelopers");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.FunctionalityBlock", b =>
-                {
-                    b.Navigation("Tasks");
-                });
-
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Project", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Project", b =>
                 {
                     b.Navigation("Board")
                         .IsRequired();
 
+                    b.Navigation("ProjectDetail")
+                        .IsRequired();
+
                     b.Navigation("ProjectDevelopers");
 
                     b.Navigation("ProjectTechnologies");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.ProjectDetail", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.ProjectOwner", b =>
                 {
-                    b.Navigation("Project")
-                        .IsRequired();
-                });
+                    b.Navigation("Feedbacks");
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.ProjectOwner", b =>
-                {
                     b.Navigation("Projects");
                 });
 
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Team", b =>
-                {
-                    b.Navigation("TeamDevelopers");
-                });
-
-            modelBuilder.Entity("ProjectCollaborationPlatform.Data.Models.Technology", b =>
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Data.Models.Technology", b =>
                 {
                     b.Navigation("DeveloperTechnologies");
 
                     b.Navigation("ProjectTechnologies");
+                });
+
+            modelBuilder.Entity("ProjectCollaborationPlatform.DAL.Models.PhotoFile", b =>
+                {
+                    b.Navigation("Developer")
+                        .IsRequired();
+
+                    b.Navigation("ProjectOwner")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

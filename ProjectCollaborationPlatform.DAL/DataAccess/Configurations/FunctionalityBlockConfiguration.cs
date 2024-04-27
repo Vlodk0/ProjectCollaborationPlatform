@@ -9,9 +9,6 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess.Configurations
         public void Configure(EntityTypeBuilder<FunctionalityBlock> builder)
         {
             builder
-                .HasMany(t => t.Tasks)
-                .WithOne(f => f.FunctionalityBlock);
-            builder
                 .HasKey(t => t.Id);
         }
     }
