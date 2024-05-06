@@ -3,7 +3,7 @@ using ProjectCollaborationPlatform.DAL.Data.Models;
 
 namespace ProjectCollaborationPlatform.WebAPI
 {
-    public class DBSeeder
+    public class DBSeeder//can be done in scope of entityBuilder with .HasData(...)
     {
         public readonly ProjectPlatformContext _context;
 

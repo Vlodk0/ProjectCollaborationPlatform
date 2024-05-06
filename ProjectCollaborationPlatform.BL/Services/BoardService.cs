@@ -55,8 +55,8 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<bool> DeleteBoard(string name, CancellationToken token)
         {
-
-            var board = await _context.Boards.Where(i => i.Name == name).FirstOrDefaultAsync(token);
+            
+            var board = await _context.Boards.Where(i => i.Name == name).FirstOrDefaultAsync(token);//you could do something like await _context.Boards.FirstOrDefaultAsync(i => i.Name == name, token);
 
             if (board == null)
             {

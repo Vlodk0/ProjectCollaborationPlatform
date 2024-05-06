@@ -36,7 +36,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
 
             var funcBlock = await _functionalityBlockService.GetFunctionalityBlockById(functionalityBlockDTO.Id,
-                token);
+                token);//don't see potential use case when you can request a creation of functionality with the same id. you don't need this method call here
 
             if (funcBlock != null)
             {
@@ -51,7 +51,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             if (await _functionalityBlockService.CreateFunctionalityBlock(functionalityBlockDTO, boardId))
             {
                 var createdFuncBlock = await _functionalityBlockService
-                    .GetFunctionalityBlockById(functionalityBlockDTO.Id, token);
+                    .GetFunctionalityBlockById(functionalityBlockDTO.Id, token);//this is not OK. you can return the entity in line 51 without this call
 
                 return Created("api/functionalityBlock", createdFuncBlock);
             }
@@ -143,7 +143,8 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             return Ok(funcBlock);
         }
 
-        [HttpPatch("task/{id:Guid}")]
+        [HttpPatch("task/{id:Guid}")]//this method can be merged with UpdateFunctionalityBlock. another thing - there is too much BL in your controllers.
+                                     //you could potentially put lines 150 - 162 inside the service and don't map from dto and to dto so many times. it is related to all your controllers
         public async Task<IActionResult> UpdateFunctionalityBlockByStatus([FromRoute] Guid id, [FromBody] StatusEnum status, 
             CancellationToken token)
         {

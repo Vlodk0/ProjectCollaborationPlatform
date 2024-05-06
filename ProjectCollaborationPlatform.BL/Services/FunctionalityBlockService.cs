@@ -50,7 +50,7 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<bool> DeleteFunctionalityBlock(Guid id)
         {
-            var entity = await _context.FunctionalityBlocks.Where(fb => fb.Id == id).FirstOrDefaultAsync();
+            var entity = await _context.FunctionalityBlocks.Where(fb => fb.Id == id).FirstOrDefaultAsync();//you've already checked if it exists
             if (entity == null)
             {
                 return false;

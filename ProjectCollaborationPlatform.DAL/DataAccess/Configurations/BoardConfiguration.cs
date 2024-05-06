@@ -14,6 +14,8 @@ namespace ProjectCollaborationPlatform.DAL.Data.DataAccess.Configurations
                 .WithOne(b => b.Board);
             builder
                 .HasKey(i => i.Id);
+            //here you can have your seed
+            builder.HasData(null);
         }
     }
 }

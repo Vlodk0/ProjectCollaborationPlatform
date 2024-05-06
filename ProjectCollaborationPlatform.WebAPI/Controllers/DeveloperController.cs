@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
-using ProjectCollaborationPlatform.BL.Services;
+using ProjectCollaborationPlatform.BL.Services;//not needed
 using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
 using ProjectCollaborationPlatform.Domain.Pagination;
@@ -33,7 +33,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 return BadRequest();
             }
 
-            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));//it can be extracted into service
             string email = HttpContext.User.FindFirstValue(ClaimTypes.Email);
 
             var usr = await _developerService.GetDeveloperById(id, token);
@@ -60,7 +60,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             if (createUser)
             {
-                return Ok(new
+                return Ok(new//better use CreatedAtAction(...)
                 {
                     message = "User created"
                 });
@@ -89,11 +89,11 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Title = "User not found",
-                    Detail = $"User with such id not found"
+                    Detail = $"User with such id not found"//$ not needed
                 };
             }
 
-            return Ok(new
+            return Ok(new//GetDeveloperById is expected to return an entity according to its name
             {
                 message = "User exists"
             });
@@ -102,7 +102,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         [Authorize]
         [HttpGet("{id:Guid}")]
-        public async Task<IActionResult> GetDeveloper([FromRoute] Guid id, CancellationToken token)
+        public async Task<IActionResult> GetDeveloper([FromRoute] Guid id, CancellationToken token)//isn't that a duplication of the method above?
         {
             var dev = await _developerService.GetDeveloperById(id, token);
 
@@ -156,7 +156,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         [HttpGet("developers")]
         public async Task<IActionResult> GetAllDevelopers([FromQuery] PaginationFilter paginationFilter, CancellationToken token)
         {
-            var filter = new PaginationFilter(paginationFilter.PageNumber, paginationFilter.PageSize);
+            var filter = new PaginationFilter(paginationFilter.PageNumber, paginationFilter.PageSize);//why do you need this row?
             var developers = await _developerService.GetAllDevelopers(filter, token);
 
             return Ok(developers);

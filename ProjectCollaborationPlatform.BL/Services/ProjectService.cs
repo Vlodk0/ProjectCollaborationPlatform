@@ -136,6 +136,7 @@ namespace ProjectCollaborationPlatform.BL.Services
         }
 
         public async Task<PagedResponse<List<ProjectFullInfoDTO>>> GetAllProjectsByProjectOwnerId(Guid id, PaginationFilter filter, CancellationToken token)
+        //common logic from GetAllProjects can be extracted
         {
             IQueryable<Project> query = _context.Projects.Where(po => po.ProjectOwnerID == id);
 

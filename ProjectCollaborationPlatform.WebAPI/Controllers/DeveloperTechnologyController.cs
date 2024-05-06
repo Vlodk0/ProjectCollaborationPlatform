@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
-using ProjectCollaborationPlatform.Domain.DTOs;
+using ProjectCollaborationPlatform.Domain.DTOs;//not needed
 using ProjectCollaborationPlatform.Domain.Helpers;
 using System.Security.Claims;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
     [Route("api/Developer/Technologies")]
-    [Authorize(Policy = "DeveloperRole")]
+    [Authorize(Policy = "DeveloperRole")]//this attribute protects all methods inside. no need to put [Authorize] on each method again
     [ApiController]
     public class DeveloperTechnologyController : ControllerBase
     {

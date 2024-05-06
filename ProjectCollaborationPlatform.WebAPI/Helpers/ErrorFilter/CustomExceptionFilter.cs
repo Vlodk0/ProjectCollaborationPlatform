@@ -18,6 +18,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Helpers.ErrorFilter
 
         public void OnException(ExceptionContext context)
         {
+            //you can have 1 switch to build whole objects instead of step by step property assignment
             var statusCode = context.Exception switch
             {
                 CustomApiException apiException => apiException.StatusCode,
