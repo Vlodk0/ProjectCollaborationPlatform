@@ -55,12 +55,15 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<bool> DeleteBoard(string name, CancellationToken token)
         {
-
-            var board = await _context.Boards.Where(i => i.Name == name).FirstOrDefaultAsync(token);
-
+            var board = await _context.Boards.FirstOrDefaultAsync(i => i.Name == name, token);
             if (board == null)
             {
-                return false;
+                throw new CustomApiException
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Board not found",
+                    Detail = "Board with such name doesn't exist"
+                };
             }
 
             _context.Boards.Remove(board);
@@ -68,22 +71,7 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await SaveBoardAsync();
         }
 
-        public async Task<BoardDTO> GetBoardById(Guid id, CancellationToken token)
-        {
-            var board = await _context.Boards.Where(i => i.Id == id).FirstOrDefaultAsync(token);
-
-            if (board == null)
-            {
-                return null;
-            }
-
-            return new BoardDTO()
-            {
-                Name = board.Name,
-            };
-        }
-
-        public async Task<BoardDTO> GetBoardByName(string name, CancellationToken token)
+        public async Task<BoardDTO?> GetBoardByName(string name, CancellationToken token)
         {
             var board = await _context.Boards.Where(i => i.Name == name).FirstOrDefaultAsync(token);
 
@@ -92,7 +80,10 @@ namespace ProjectCollaborationPlatform.BL.Services
                 return null;
             }
 
-            return new BoardDTO()
+            //TODO: it's not obvious why you return only the name in the whole DTO
+            //maybe it's all YOUR frontend needs, but please keep in mind that you are building an API which many frontends might use in future
+            //so you have to build it like you don't know nothing about frontend
+            return new BoardDTO
             {
                 Name = board.Name,
             };
@@ -108,7 +99,19 @@ namespace ProjectCollaborationPlatform.BL.Services
         {
             var board = await _context.Boards.Where(n => n.ProjectID == id).FirstOrDefaultAsync();
 
+            if (board is null)
+            {
+                //TODO: handle null
+                throw new CustomApiException
+                {
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Title = "Board not found",
+                    Detail = "Board with such name doesn't exist"
+                };
+            }
+            
             board.Name = name;
+            
             _context.Boards.Update(board);
             return await SaveBoardAsync();
         }

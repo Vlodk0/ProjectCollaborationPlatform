@@ -5,7 +5,7 @@ namespace ProjectCollaborationPlatform.WebAPI
 {
     public class DBSeeder
     {
-        public readonly ProjectPlatformContext _context;
+        private readonly ProjectPlatformContext _context;
 
         public DBSeeder(ProjectPlatformContext context)
         {

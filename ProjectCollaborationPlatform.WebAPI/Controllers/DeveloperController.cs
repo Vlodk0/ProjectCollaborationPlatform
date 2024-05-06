@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
-using ProjectCollaborationPlatform.BL.Services;
 using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
 using ProjectCollaborationPlatform.Domain.Pagination;
@@ -15,11 +14,9 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
     public class DeveloperController : ControllerBase
     {
         private readonly IDeveloperService _developerService;
-        private readonly IPhotoManageService _photoService;
 
-        public DeveloperController(IDeveloperService developerService, IPhotoManageService photoService)
+        public DeveloperController(IDeveloperService developerService)
         {
-            _photoService = photoService;
             _developerService = developerService;
         }
 
@@ -27,17 +24,16 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateDeveloper(CreateDeveloperDTO developerDTO, CancellationToken token)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            string email = HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            var id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var email = HttpContext.User.FindFirstValue(ClaimTypes.Email);
 
+            //TODO: all this logic can be taken to _developerService.AddDeveloper to leave Controllers thin as possible
             var usr = await _developerService.GetDeveloperById(id, token);
-
             if (usr != null)
             {
                 throw new CustomApiException()
