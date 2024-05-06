@@ -22,51 +22,33 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<bool> AddProject(CreateProjectDTO projectDTO, Guid id, CancellationToken token)
         {
-            var project = new Project()
+            var projectId = Guid.NewGuid();
+            
+            var project = new Project
             {
+                Id = projectId,
                 Title = projectDTO.Title,
                 Payment = projectDTO.Payment,
                 ShortInfo = projectDTO.ShortInfo,
                 ProjectOwnerID = id,
             };
+            
+            var projectDetails = new ProjectDetail
+            {
+                ProjectID = projectId,
+                Description = projectDTO.Description,
+            };
+            
+            var board = new Board
+            {
+                Name = projectDTO.BoardName,
+                ProjectID = projectId,
+            };
 
             _context.Projects.Add(project);
-            if (!await SaveProjectAsync())
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Title = "Server Error",
-                    Detail = "Error occured while creating project"
-                };
-            }   
-
-            var prj = await _context.Projects.Where(p => p.Title == projectDTO.Title).FirstOrDefaultAsync(token);
-
-            await AddProjectDetails(prj.Id, projectDTO.Description);
-
-            return await AddBoardOnTheProject(prj.Id, projectDTO.BoardName);
-        }
-
-        private async Task<bool> AddProjectDetails(Guid id, string description)
-        {
-            var projectDetails = new ProjectDetail()
-            {
-                ProjectID = id,
-                Description = description,
-            };
             _context.ProjectDetails.Add(projectDetails);
-            return await SaveProjectAsync();
-        }
-
-        private async Task<bool> AddBoardOnTheProject(Guid id, string name)
-        {
-            var board = new Board()
-            {
-                Name = name,
-                ProjectID = id,
-            };
             _context.Boards.Add(board);
+
             return await SaveProjectAsync();
         }
 
@@ -147,7 +129,7 @@ namespace ProjectCollaborationPlatform.BL.Services
                 _ => query
             };
 
-            var totalRecords = await query.CountAsync();
+            var totalRecords = await query.CountAsync(cancellationToken: token);
             var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);
 
             query = query
@@ -195,6 +177,7 @@ namespace ProjectCollaborationPlatform.BL.Services
             return await _context.Projects
                 .Include(pd => pd.ProjectDetail)
                 .Include(pt => pt.ProjectTechnologies)
+                .AsNoTracking()
                 .Where(i => i.Id == id)
                 .Select(t => new GetProjectDTO()
                 {

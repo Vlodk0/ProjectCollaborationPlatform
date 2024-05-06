@@ -7,7 +7,6 @@ using ProjectCollaborationPlatform.Domain.Helpers;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
-
     [Route("api/[controller]")]
     [Authorize(Policy = "ProjectOwner")]
     [ApiController]
@@ -66,17 +65,15 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             var board = await _boardService.GetBoardByName(name, token);
             if (board != null)
             {
-                return StatusCode(StatusCodes.Status200OK, board);
+                return Ok(board);
             }
-            else
+
+            throw new CustomApiException
             {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Title = "Board not found",
-                    Detail = "Board with such name doesn't exist"
-                };
-            }
+                StatusCode = StatusCodes.Status404NotFound,
+                Title = "Board not found",
+                Detail = "Board with such name doesn't exist"
+            };
         }
 
         [HttpPut("Board/{id:Guid}")]
@@ -84,47 +81,23 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         {
             if (await _boardService.UpdateBoard(id, boardDTO.Name))
             {
-                return StatusCode(StatusCodes.Status200OK, "Board updated succesfully");
+                return NoContent();
             }
-            else
+
+            throw new CustomApiException
             {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Title = "Server Error",
-                    Detail = "Error occured while server running"
-                };
-            }
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Title = "Server Error",
+                Detail = "Error occured while server running"
+            };
         }
 
         [HttpDelete("{name}")]
         public async Task<ActionResult<Board>> DeleteBoardByName([FromRoute] string name, CancellationToken token)
         {
-            var boardToDelete = await _boardService.GetBoardByName(name, token);
+            await _boardService.DeleteBoard(name, token);
 
-            if (boardToDelete == null)
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Title = "Board not found",
-                    Detail = "Board with such name doesn't exist"
-                };
-            }
-
-            if (await _boardService.DeleteBoard(boardToDelete.Name, token))
-            {
-                return StatusCode(StatusCodes.Status200OK, "Board deleted succesfully");
-            }
-            else
-            {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Title = "Server Error",
-                    Detail = "Error occured while server running"
-                };
-            }
+            return NoContent();
         }
     }
 }

@@ -96,8 +96,7 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<PagedResponse<List<PaginationDeveloperDTO>>> GetAllDevelopers(PaginationFilter filter, CancellationToken token)
         {
-            IQueryable<Developer> query = _context.Developers
-                .Where(i => i.IsDeleted == false);
+            var query = _context.Developers.Where(i => i.IsDeleted == false);
 
             var totalRecords = await query.CountAsync(token);
             var totalPages = (int)Math.Ceiling(totalRecords / (double)filter.PageSize);

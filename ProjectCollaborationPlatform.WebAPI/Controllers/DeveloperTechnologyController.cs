@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectCollaborationPlatform.BL.Interfaces;
-using ProjectCollaborationPlatform.Domain.DTOs;
 using ProjectCollaborationPlatform.Domain.Helpers;
-using System.Security.Claims;
+using ProjectCollaborationPlatform.WebAPI.Helpers;
 
 namespace ProjectCollaborationPlatform.WebAPI.Controllers
 {
@@ -19,7 +18,6 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             _technologyService = technologyService;
         }
 
-
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddTechnologyForDeveloper([FromBody] List<string> techId)
@@ -29,23 +27,21 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 return BadRequest();
             }
 
-            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));   
+            var userId = HttpContext.GetUserId();
 
-            var result = await _technologyService.AddTechnologyForDeveloper(id, techId);
+            var result = await _technologyService.AddTechnologyForDeveloper(userId, techId);
 
             if (result)
             {
                 return Ok();
             }
-            else
+
+            throw new CustomApiException()
             {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Title = "Server Error",
-                    Detail = "Error occured while adding technologies for dev"
-                };
-            }
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Title = "Server Error",
+                Detail = "Error occured while adding technologies for dev"
+            };
         }
 
         [Authorize]
@@ -57,43 +53,39 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                 return BadRequest();
             }
 
-            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = HttpContext.GetUserId();
 
-            var result = await _technologyService.RemoveTechnologyFromDeveloper(id, techId);
-
+            var result = await _technologyService.RemoveTechnologyFromDeveloper(userId, techId);
             if (result)
             {
                 return Ok();
             }
-            else
+
+            throw new CustomApiException
             {
-                throw new CustomApiException()
-                {
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Title = "Server Error",
-                    Detail = "Error occured while deleting from dev"
-                };
-            }
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Title = "Server Error",
+                Detail = "Error occured while deleting from dev"
+            };
         }
 
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllDeveloperTechnologies(CancellationToken token)
         {
-            Guid id = Guid.Parse(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-
-            var technologies = await _technologyService.GetAllDeveloperTechnologies(id, token);
+            var userId = HttpContext.GetUserId();
+            var technologies = await _technologyService.GetAllDeveloperTechnologies(userId, token);
 
             if (technologies == null)
             {
-                throw new CustomApiException()
+                throw new CustomApiException
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Title = "Technologies not found",
                     Detail = "Technologies with such id doesn't exist"
                 };
             }
+
             return Ok(technologies);
         }
 
@@ -101,12 +93,11 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         [HttpGet("dev/{id:Guid}")]
         public async Task<IActionResult> GetAllDeveloperTechnologies([FromRoute] Guid id, CancellationToken token)
         {
-
             var technologies = await _technologyService.GetAllDeveloperTechnologies(id, token);
 
             if (technologies == null)
             {
-                throw new CustomApiException()
+                throw new CustomApiException
                 {
                     StatusCode = StatusCodes.Status404NotFound,
                     Title = "Technologies not found",
@@ -115,6 +106,5 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             }
             return Ok(technologies);
         }
-
     }
 }

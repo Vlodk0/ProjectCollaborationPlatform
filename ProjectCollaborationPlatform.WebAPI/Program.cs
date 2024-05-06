@@ -100,15 +100,13 @@ namespace ProjectCollaborationPlatform.WebAPI
             if (args.Length == 1 && args[0].ToLower() == "seeddata")
                 SeedData(app);
 
-            void SeedData(IHost app)
+            void SeedData(IHost host)
             {
-                var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+                var scopedFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
 
-                using (var scope = scopedFactory.CreateScope())
-                {
-                    var service = scope.ServiceProvider.GetService<DBSeeder>();
-                    service.SeedTechnologies();
-                }
+                using var scope = scopedFactory.CreateScope();
+                var service = scope.ServiceProvider.GetRequiredService<DBSeeder>();
+                service.SeedTechnologies();
             }
 
             // Configure the HTTP request pipeline.
