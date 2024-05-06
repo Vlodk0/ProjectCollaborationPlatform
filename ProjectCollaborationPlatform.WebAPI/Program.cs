@@ -66,7 +66,7 @@ namespace ProjectCollaborationPlatform.WebAPI
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = builder.Configuration["JWT:Issuer"],
+                        ValidIssuer = builder.Configuration["JWT:Issuer"],//better to use bound models for configs instead of direct IConfiguration calls
 
                         ValidateAudience = true,
                         ValidAudience = builder.Configuration["JWT:Audience"],

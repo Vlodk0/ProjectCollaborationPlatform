@@ -144,7 +144,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     Detail = "Project is already exist"
                 };
             }
-            if (await _projectService.AddProject(project, id, token))
+            if (await _projectService.AddProject(project, id, token))//again, you can return created entity here
             {
                 var createdProject = await _projectService.GetProjectByName(project.Title, token);
                 return Created("api/project", createdProject);
@@ -194,7 +194,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         [Authorize(Policy = "AdminProjectOwnerRole")]
         [HttpPut("ProjectDetails/{id:Guid}")]
-        public async Task<IActionResult> UpdateProjectDetails([FromBody] ProjectDetailDTO projectDetailDTO, [FromRoute] Guid id, CancellationToken token)
+        public async Task<IActionResult> UpdateProjectDetails([FromBody] ProjectDetailDTO projectDetailDTO, [FromRoute] Guid id, CancellationToken token)//can be merged with UpdateProject method
         {
 
             if (await _projectService.UpdateProjectDetails(id, projectDetailDTO.Description))
@@ -216,7 +216,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         [HttpDelete("{id:Guid}")]
         public async Task<ActionResult<Project>> DeleteProjectById([FromRoute] Guid id, CancellationToken token)
         {
-            var projectToDelete = await _projectService.GetProjectById(id, token);
+            var projectToDelete = await _projectService.GetProjectById(id, token);//you do a lot of includes inside which are not needed. not efficient deleting
 
             if (projectToDelete == null)
             {

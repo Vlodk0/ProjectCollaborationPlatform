@@ -1,6 +1,6 @@
 ﻿namespace ProjectCollaborationPlatform.Domain.Enums
 {
-    public enum StatusEnum
+    public enum StatusEnum//there is no need in 'Enum' suffix
     {
         Todo = 1,
         InProcess = 2,

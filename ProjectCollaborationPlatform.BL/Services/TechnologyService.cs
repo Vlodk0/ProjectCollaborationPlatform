@@ -55,7 +55,7 @@ namespace ProjectCollaborationPlatform.BL.Services
 
         public async Task<bool> AddTechnologyForDeveloper(Guid id, List<string> techId)
         {
-            bool dev = await _context.Developers.AnyAsync(i => i.Id == id);
+            bool dev = await _context.Developers.AnyAsync(i => i.Id == id);//why not var devExists = ...?
             if (!dev)
             {
                 throw new CustomApiException()
@@ -82,7 +82,7 @@ namespace ProjectCollaborationPlatform.BL.Services
             var developerTechnologies = techId.Select(techId => new DeveloperTechnology
             {
                 DeveloperID = id,
-                TechnologyID = Guid.Parse(techId)
+                TechnologyID = Guid.Parse(techId)//guid.parse is done twice. it was better to store parsed values in variable
             }).ToList();
 
             _context.DeveloperTechnologies.AddRange(developerTechnologies);
@@ -145,7 +145,12 @@ namespace ProjectCollaborationPlatform.BL.Services
                 };
             }
             bool allTechIdsExist = techId.All(techId =>
-                _context.Technologies.Any(x => x.Id == Guid.Parse(techId)));
+                _context.Technologies.Any(x => x.Id == Guid.Parse(techId)));//a lot of sync db calls. you could make it in parallel
+                                                                            //var tasks = techId.Select(techId =>
+                                                                            // _context.Technologies.AnyAsync(x => x.Id == Guid.Parse(techId))) 
+                                                                            //var results = await Task.WhenAll(tasks);
+                                                                            //var allTechIdsExist = results.All(x => x);
+                                                                            //also this code(lines 147-169) is common for most of your methods. can be a separate method
 
             if (!allTechIdsExist)
             {
@@ -190,7 +195,7 @@ namespace ProjectCollaborationPlatform.BL.Services
         public async Task<List<TechnologyDTO>> GetAllTechnologiesByProjectId(Guid projId, CancellationToken token)
         {
             var technologies = await _context.Projects
-                            .Where(p => p.Id == projId)
+                            .Where(p => p.Id == projId)//it must be .FirstOrDefault instead of Where. then you can map your technologies
                             .SelectMany(p => p.ProjectTechnologies.Select(pt => pt.Technology))
                             .Select(t => new TechnologyDTO
                             {

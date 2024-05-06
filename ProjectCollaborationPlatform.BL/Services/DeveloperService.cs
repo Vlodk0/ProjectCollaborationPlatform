@@ -22,7 +22,7 @@ namespace ProjectCollaborationPlatform.BL.Services
         {
             var user = await _context.Developers.Where(i => i.Id == id).FirstOrDefaultAsync();
   
-            if (user != null && user.IsDeleted)
+            if (user != null && user.IsDeleted)//we already checked it in GetDeveloperById method and controller. it is never true
             {
                 throw new CustomApiException()
                 {
@@ -84,10 +84,10 @@ namespace ProjectCollaborationPlatform.BL.Services
                 {
                     StatusCode = StatusCodes.Status403Forbidden,
                     Title = "Access forbidden",
-                    Detail = "Your accound was deleted by admin"
+                    Detail = "Your accound was deleted by admin"//will admin see this message? it can stun him
                 };
             }
-            else
+            else//not needed
             {
                 return getDev;
             }

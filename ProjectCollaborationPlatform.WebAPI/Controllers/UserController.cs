@@ -30,7 +30,10 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetById(CancellationToken token)
+        public async Task<IActionResult> GetById(CancellationToken token)// a lot of business logic inside of controller. consider extracting into the service
+        //also there shouldn't be any difference between dev and PO - they are both users. common logic must be extracted into base entity.
+        //according to your BL PO can be a user with 1 assigned project and without technologies, so it can be even single entity
+        //all repeatable logic with user types will become redundant
         {
             Guid id;
             String roleName;

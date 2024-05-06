@@ -25,7 +25,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         {
             if (board == null)
             {
-                throw new CustomApiException()
+                throw new CustomApiException()//exceptions in controller are not OK. simply return BadRequest
                 {
                     StatusCode = StatusCodes.Status400BadRequest,
                     Title = "Bad request",
@@ -35,7 +35,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
 
             var brd = await _boardService.GetBoardByName(board.Name, token);
 
-            if (brd != null)
+            if (brd != null)//why can't we have 2 boards with the same name but different guids? questionable but maybe it is important for your BL
             {
                 throw new CustomApiException()
                 {
@@ -44,12 +44,13 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
                     Detail = "Board is already in use"
                 };
             }
-            if (await _boardService.CreateBoard(id, board))
+            if (await _boardService.CreateBoard(id, board))//you could simply return the whole object after context.SaveChanges(). there is no need to call context twice 
+                                                           //https://stackoverflow.com/questions/5212751/how-can-i-retrieve-id-of-inserted-entity-using-entity-framework
             {
                 var createdProject = await _boardService.GetBoardByName(board.Name, token);
                 return Created("api/board", createdProject);
             }
-            else
+            else//this else statement and exception are not needed. there is no reason to return 500 at the end of the method
             {
                 throw new CustomApiException()
                 {
@@ -66,7 +67,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
             var board = await _boardService.GetBoardByName(name, token);
             if (board != null)
             {
-                return StatusCode(StatusCodes.Status200OK, board);
+                return StatusCode(StatusCodes.Status200OK, board);//why not return Ok(board);?
             }
             else
             {
@@ -80,7 +81,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpPut("Board/{id:Guid}")]
-        public async Task<IActionResult> UpdateBoard([FromBody] BoardDTO boardDTO, [FromRoute] Guid id)
+        public async Task<IActionResult> UpdateBoard([FromBody] BoardDTO boardDTO, [FromRoute] Guid id)//better name it projectId instead of id. not clear naming
         {
             if (await _boardService.UpdateBoard(id, boardDTO.Name))
             {
@@ -98,7 +99,7 @@ namespace ProjectCollaborationPlatform.WebAPI.Controllers
         }
 
         [HttpDelete("{name}")]
-        public async Task<ActionResult<Board>> DeleteBoardByName([FromRoute] string name, CancellationToken token)
+        public async Task<ActionResult<Board>> DeleteBoardByName([FromRoute] string name, CancellationToken token)//why ActionResult<Board> but not IActionResult?
         {
             var boardToDelete = await _boardService.GetBoardByName(name, token);
 
